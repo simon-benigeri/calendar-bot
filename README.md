@@ -4,14 +4,14 @@ A conversational UI to ask questions about your weekly calendar and to update yo
 ## Setup guide
 
 ### 1. GOOGLE API KEY for Gemini
-1. Create one here: `https://aistudio.google.com/app/apikey`
+1. Create one here: https://aistudio.google.com/app/apikey
 2. Save it in a .env file like so
 ```
 GOOGLE_API_KEY=<API_KEY>
 ```
 
 ### 2. Google calendar API access (ignore this we are doing a zoom to walk through it)
-1. Go to `https://cloud.google.com/endpoints/docs/openapi/enable-api#console` (make sure you are logged in) and click on `Go to APIs & Services1
+1. Go to https://cloud.google.com/endpoints/docs/openapi/enable-api#console (make sure you are logged in) and click on `Go to APIs & Services1
  Instructions: Set Up Google Cloud Project
 2. Create a Google Cloud project if you don't have one:
     - Visit the Google Cloud Console.
@@ -25,6 +25,7 @@ GOOGLE_API_KEY=<API_KEY>
     - Configure the consent screen if prompted.
     - Set the application type to "Desktop app" and give it a name.
     - Download the JSON file for your credentials.
+5. Add your email as a test user in the app: https://stackoverflow.com/questions/75454425/access-blocked-project-has-not-completed-the-google-verification-process
 <!-- 2. Select your project linked to the Gemini credits. If you do not have a project, create a project:
     First go to the dropdown menu to select projects
     ![alt text](assets/google_cloud_select_project.png)

@@ -2,11 +2,13 @@ import asyncio
 import nest_asyncio
 import json
 import os
+import argparse
 from dotenv import load_dotenv
 from datetime import date
 
 import langchain
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_community.chat_models import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import (
     ChatPromptTemplate,
@@ -46,8 +48,9 @@ Calendar:
 
 """
 
+
 async def get_response(chain, input):
-    # print(f"Sending the following prompt to the model: {input}")  
+    # print(f"Sending the following prompt to the model: {input}")
     response = ""
     async for chunk in chain.astream(input):
         print(chunk, end="", flush=True)  # This prints each chunk as it is received.
@@ -103,9 +106,31 @@ async def main(calendar):
         # print(f"response: {response}")
 
 
+# Create the parser
+parser = argparse.ArgumentParser(
+    description="This script allows the user to choose between using the Gemini API or the Ollama model phi-3."
+)
+
+# Add the '--gemini' boolean flag
+parser.add_argument(
+    "-g",
+    "--gemini",
+    action="store_true",
+    default=False,
+    help="Use Gemini API, if not, use Ollama model phi-3.",
+)
+
+
 if __name__ == "__main__":
+    # Parse the arguments
+    args = parser.parse_args()
     calendar = load_calendar("my_calendar_data.json")
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
+    if args.gemini:
+        llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
+        print("Using Gemini API.")
+    else:
+        llm = ChatOllama(model="phi3")
+        print("Using Ollama model phi-3.")
     nest_asyncio.apply()
     # submit full calendar by removing the [0]. only passing the first event here
     asyncio.run(main(calendar[0]))
