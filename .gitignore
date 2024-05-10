@@ -1,3 +1,22 @@
+credentials.json
+credentials-desktop.json
+token.json
+backend.py
+gemini_api_key
+mistral_backend.py
+my_calendar_data.json
+setup_googlecal.md
+assets/credentials.png
+assets/Enable_API.png
+assets/google_calendar_api.png
+assets/google_cloud_create_project.png
+assets/google_cloud_create_project2.png
+assets/google_cloud_create_project3.png
+assets/google_cloud_select_project.png
+assets/search_calendar.png
+
+
+*.ipynb
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -158,3 +177,4 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+

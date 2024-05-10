@@ -1,7 +1,10 @@
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
+langchain-google-genai
 langchain
-gpt4all
+python-dotenv
 jupyterlab
 black
+
+# pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib

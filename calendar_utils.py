@@ -4,7 +4,7 @@ import datetime
 import json
 
 # Path to your credentials JSON file
-CREDENTIALS_FILE = "path_to_credentials.json"
+CREDENTIALS_FILE = "credentials.json"
 
 # Specify the scopes: URL that indicates Google Calendar API
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
@@ -28,7 +28,7 @@ def get_calendar_events():
         .list(
             calendarId="primary",
             timeMin=now,
-            maxResults=10,
+            maxResults=5,
             singleEvents=True,
             orderBy="startTime",
         )
@@ -45,7 +45,8 @@ def get_calendar_events():
     return events
 
 
-# Save events to a JSON file
-events = get_calendar_events()
-with open("my_calendar_data.json", "w") as f:
-    json.dump(events, f)
+if __name__=="__main__":
+    # Save events to a JSON file
+    events = get_calendar_events()
+    with open("my_calendar_data.json", "w") as f:
+        json.dump(events, f)
