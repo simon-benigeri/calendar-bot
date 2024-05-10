@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from datetime import date
 
+import langchain
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import (
@@ -14,6 +15,7 @@ from langchain_core.prompts import (
 
 from langchain_core.messages import HumanMessage, AIMessage
 
+langchain.verbose = True
 
 # Load GOOGLE API KEY
 load_dotenv()  # load all the environment variables from .env file
@@ -29,19 +31,23 @@ def load_calendar(file_path):
         return json.load(file)
 
 
-calendar = load_calendar("my_calendar_data.json")
-
-
 PROMPT_TEMPLATE = """\
-Today's date is {date}. Answer any of the user's questions about their calendar below.
+Today's date is {date}. 
+If you are asked about today's date, you must respond with the date you have just been provided.
+
+For example:
+User: What is today's date?
+AI: Today's date is {date}. 
+
+Answer any of the user's questions about their calendar below.
 
 Calendar:
 {calendar}
 
 """
 
-
 async def get_response(chain, input):
+    print(f"Sending the following prompt to the model: {input}")  
     response = ""
     async for chunk in chain.astream(input):
         print(chunk, end="", flush=True)  # This prints each chunk as it is received.
@@ -49,7 +55,7 @@ async def get_response(chain, input):
     return response  # Return the complete response after all chunks are received.
 
 
-async def main():
+async def main(calendar):
     chat_history = []
 
     while True:
@@ -78,7 +84,7 @@ async def main():
             chain,
             input={
                 "date": formatted_date,
-                "calendar": json.dumps(calendar[0], indent=2),
+                "calendar": json.dumps(calendar, indent=2),
                 "chat_history": chat_history,
                 "question": question,
             },
@@ -98,6 +104,7 @@ async def main():
 
 
 if __name__ == "__main__":
+    calendar = load_calendar("my_calendar_data.json")
     llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
     nest_asyncio.apply()
-    asyncio.run(main())
+    asyncio.run(main(calendar[0]))
