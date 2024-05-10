@@ -47,7 +47,7 @@ Calendar:
 """
 
 async def get_response(chain, input):
-    print(f"Sending the following prompt to the model: {input}")  
+    # print(f"Sending the following prompt to the model: {input}")  
     response = ""
     async for chunk in chain.astream(input):
         print(chunk, end="", flush=True)  # This prints each chunk as it is received.
@@ -107,4 +107,5 @@ if __name__ == "__main__":
     calendar = load_calendar("my_calendar_data.json")
     llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest")
     nest_asyncio.apply()
+    # submit full calendar by removing the [0]. only passing the first event here
     asyncio.run(main(calendar[0]))
