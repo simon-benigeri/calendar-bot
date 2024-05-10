@@ -45,16 +45,16 @@ If you do have a project, select it.
 
 
 ### 3. Setup your python environment
-`conda create -n calendar-bot python=3.10`
-`conda activate calendar-bot`
-`pip install -r requirements.txt`
+`conda create -n calendar-bot python=3.10`  
+`conda activate calendar-bot`  
+`pip install -r requirements.txt`  
 
 
 ### 4. Run the code
-To download the calendar data:
+To download the calendar data:  
 `python calendar_utils.py`
 
-To start chatting with Gemini:
+To start chatting with Gemini:  
 `python calendar_bot.py`
 
 
