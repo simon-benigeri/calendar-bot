@@ -174,14 +174,12 @@ async def main(calendar, small_llm, gemini_llm):
                 "chat_history": chat_history,
                 "question": question,
             },
-            verbose=True,
+            verbose=False,
         )
 
         intent = extract_most_frequent_intent(intent_response)
 
-        print("\n INTENT: \n")
-        print(intent)
-        print("\n")
+        print("\n INTENT: {intent}\n")
 
         if intent == "ask_date":
             response = f"Today's date is {formatted_date}."
