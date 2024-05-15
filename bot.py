@@ -111,10 +111,16 @@ def extract_most_frequent_intent(response):
 
 async def get_response(chain, input, verbose=True):
     response = ""
+    # Print the prefix once before the chunks start arriving
+    if verbose:
+        print("Response: ", end="", flush=True)
+
+    # Print each chunk as it arrives
     async for chunk in chain.astream(input):
         if verbose:
             print(chunk, end="", flush=True)
         response += chunk
+
     return response
 
 
@@ -150,10 +156,11 @@ async def main(calendar, small_llm, gemini_llm):
 
         intent = extract_most_frequent_intent(intent_response)
 
-        print("\n INTENT: {intent}\n")
+        print(f"INTENT: {intent}")
 
         if intent == "ask_date":
             response = f"Today's date is {formatted_date}."
+            print(f"Response: {response}")
         elif intent == "calendar_qa":
             PROMPT_TEMPLATE = CALENDAR_QA_PROMPT
             # print(f"rephrased: {question}")
@@ -179,7 +186,7 @@ async def main(calendar, small_llm, gemini_llm):
         chat_history.extend(
             [HumanMessage(content=question), AIMessage(content=response)]
         )
-        print(f"Response: {response}")
+        # print(f"Response: {response}")
 
 
 if __name__ == "__main__":
