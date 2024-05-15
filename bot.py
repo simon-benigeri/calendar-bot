@@ -21,29 +21,6 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 load_dotenv()
 
-# CALENDAR_QA_PROMPT = """\
-# Today's date is {date}. If you are asked about today's date, you must respond with the date you have just been provided.
-
-# Answer any of the user's questions about their calendar below.
-
-# Calendar:
-# {calendar}
-
-# """
-
-
-# INTENT_PROMPT = """\
-# Classify the user's query into one of the following intent categories:
-# {intents}
-
-# For example:
-# User: What day is it today?
-# AI: ask_date
-
-# User: When is my Korean class?
-# AI: calendar_qa
-
-# """
 
 INTENT_PROMPT = """
     ### Prompt for Instruct Model
@@ -68,48 +45,50 @@ INTENT_PROMPT = """
     **Output**: `ask_date`
     """
 
-# CALENDAR_QA_PROMPT = """\
-# ### Calendar Question Answering Task
-
-# **Today's Date**: {date}
-# - When asked about today's date, always respond with the above date.
-
-# **Task**: Answer the user's questions based on the provided calendar information. Use the details from the calendar to give specific, accurate answers about events and schedules.
-
-# **Instructions**:
-# 1. If asked for the date, respond with today's date given above.
-# 2. If asked about specific events, refer to the calendar entries to provide the date, time, and details of the event.
-# 3. If there is no information about a requested event, respond that no details are available.
-
-# **Calendar**:
-# {calendar}
-
-# **Examples**:
-# - Question: "What do I have going on today?"
-#   Answer: "You have a meeting scheduled at 10 AM and a doctor's appointment at 3 PM."
-# - Question: "When is my next team meeting?"
-#   Answer: "Your next team meeting is on [date] at [time]."
-
-# Please use the information provided to accurately respond to the user's inquiries about their calendar.
-# """
-
 CALENDAR_QA_PROMPT = """\
     ### Calendar Question Answering Task
 
     **Today's Date**: {date}
     - Always respond with the provided date when asked about today's date.
 
-    **Task**: Directly answer the user's questions using the calendar information provided as JSON. Do not request additional information unless the query is ambiguous or incomplete based on the available calendar data.
+    **Task**: Directly answer the user's questions using the provided calendar information. Do not request additional information unless the query is ambiguous or incomplete based on the available calendar data.
 
     **Instructions**:
     1. Use today's date from above when asked for the date.
     2. For questions about specific events, refer directly to the calendar entries to provide accurate dates, times, and details.
+    3. If the user's question pertains to an event not listed or is unclear, clarify what additional information is needed to answer effectively, while still attempting to provide as much relevant information as possible based on the available data.
 
-    **User Calendar**:
+    **Provided Calendar**:
     {calendar}
 
-    Please ensure your responses utilize the JSON calendar provided to accurately answer inquiries. Do not seek additional personal details unless the calendar data does not cover the user's question.
+    **Example Responses**:
+    - Question: "What do I have going on today?"
+    Answer: "Today, you have a doctor's appointment at 3 PM and a team meeting at 10 AM."
+    - Question: "When is my next team meeting?"
+    Answer: "Your next team meeting is scheduled for [insert date here] at [insert time here]."
+    - Question: "Is there anything on my calendar about the project deadline?"
+    Answer: "Your project deadline is noted on [insert date here]."
+
+    Please ensure your responses utilize the calendar provided to accurately answer inquiries. Do not seek additional personal details unless the calendar data does not cover the user's question.
     """
+
+# CALENDAR_QA_PROMPT = """\
+#     ### Calendar Question Answering Task
+
+#     **Today's Date**: {date}
+#     - Always respond with the provided date when asked about today's date.
+
+#     **Task**: Directly answer the user's questions using the calendar information provided as JSON. Do not request additional information unless the query is ambiguous or incomplete based on the available calendar data.
+
+#     **Instructions**:
+#     1. Use today's date from above when asked for the date.
+#     2. For questions about specific events, refer directly to the calendar entries to provide accurate dates, times, and details.
+
+#     **User Calendar**:
+#     {calendar}
+
+#     Please ensure your responses utilize the JSON calendar provided to accurately answer inquiries. Do not seek additional personal details unless the calendar data does not cover the user's question.
+#     """
 
 
 def extract_most_frequent_intent(response):
@@ -135,14 +114,6 @@ async def get_response(chain, input, verbose=True):
     async for chunk in chain.astream(input):
         if verbose:
             print(chunk, end="", flush=True)
-        response += chunk
-    return response
-
-
-async def get_intent_response(chain, input):
-    response = ""
-    async for chunk in chain.astream(input):
-        # print(chunk, end="", flush=True)
         response += chunk
     return response
 
