@@ -2,6 +2,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import datetime
 import json
+import argparse
 
 # Path to your credentials JSON file
 CREDENTIALS_FILE = "credentials.json"
@@ -40,16 +41,12 @@ def format_date_description(events):
     return events
 
 
-def filter_event_keys(events, keys_to_remove):
+def filter_event_keys(events, keys_to_keep):
     filtered_events = []
     for event in events:
-        filtered_event = {key: value for key, value in event.items() if key not in keys_to_remove}
+        filtered_event = {key: event.get(key, "") for key in event if key in keys_to_keep}
         filtered_events.append(filtered_event)
     return filtered_events
-
-# # Example usage
-# keys_to_remove = ['start', 'end', 'creator', 'organizer']
-# filtered_events = filter_event_keys(formatted_events, keys_to_remove)
 
 
 def get_calendar_events():
@@ -86,8 +83,24 @@ def get_calendar_events():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Download calendar data."
+    )
+    parser.add_argument(
+        "-f",
+        "--filter",
+        action="store_true",
+        help=f"Filter calendar events to keep keys: {['id', 'date', 'location', 'summary', 'description']}.",
+    )
+
+    args = parser.parse_args()
     # Save events to a JSON file
     events = get_calendar_events()
     print(f"Retrieving {len(events)} events.")
-    with open("my_calendar_data.json", "w") as f:
+    path = "my_calendar_data.json"
+    keys_to_keep = ['id', 'date', 'location', 'summary', 'description']
+    if args.filter:
+        events = filter_event_keys(events, keys_to_keep)
+        path = "my_calendar_data_filtered.json"
+    with open(path, "w") as f:
         json.dump(events, f)

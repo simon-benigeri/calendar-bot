@@ -1,1 +1,38 @@
-{"query": "What's happening next Monday?", "n_gram": 1, "top_n": 3, "fields": ["date", "summary", "location"], "extracted_date": ["Monday May 20"], "relevant_docs": [{"kind": "calendar#event", "etag": "\"3431592761120000\"", "id": "5am83o8j20rn00f85ltn207ao7_20240520T140000Z", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=NWFtODNvOGoyMHJuMDBmODVsdG4yMDdhbzdfMjAyNDA1MjBUMTQwMDAwWiBzaW1vbi5iZW5pZ2VyaUBt", "created": "2024-05-15T18:06:20.000Z", "updated": "2024-05-15T18:06:20.560Z", "summary": "Faraz weekly", "description": "Meeting with Nick Easton, Lacey Gleason, Faraz Ahmad", "location": "Zoom", "creator": {"email": "simon.benigeri@gmail.com", "self": true}, "organizer": {"email": "simon.benigeri@gmail.com", "self": true}, "start": {"dateTime": "2024-05-20T09:00:00-05:00", "timeZone": "America/Chicago"}, "end": {"dateTime": "2024-05-20T09:30:00-05:00", "timeZone": "America/Chicago"}, "recurringEventId": "5am83o8j20rn00f85ltn207ao7", "originalStartTime": {"dateTime": "2024-05-20T09:00:00-05:00", "timeZone": "America/Chicago"}, "iCalUID": "5am83o8j20rn00f85ltn207ao7@google.com", "sequence": 0, "reminders": {"useDefault": true}, "eventType": "default", "date": "Monday May 20, 09:00AM-09:30AM"}, {"kind": "calendar#event", "etag": "\"3431592761120000\"", "id": "5am83o8j20rn00f85ltn207ao7_20240527T140000Z", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=NWFtODNvOGoyMHJuMDBmODVsdG4yMDdhbzdfMjAyNDA1MjdUMTQwMDAwWiBzaW1vbi5iZW5pZ2VyaUBt", "created": "2024-05-15T18:06:20.000Z", "updated": "2024-05-15T18:06:20.560Z", "summary": "Faraz weekly", "description": "Meeting with Nick Easton, Lacey Gleason, Faraz Ahmad", "location": "Zoom", "creator": {"email": "simon.benigeri@gmail.com", "self": true}, "organizer": {"email": "simon.benigeri@gmail.com", "self": true}, "start": {"dateTime": "2024-05-27T09:00:00-05:00", "timeZone": "America/Chicago"}, "end": {"dateTime": "2024-05-27T09:30:00-05:00", "timeZone": "America/Chicago"}, "recurringEventId": "5am83o8j20rn00f85ltn207ao7", "originalStartTime": {"dateTime": "2024-05-27T09:00:00-05:00", "timeZone": "America/Chicago"}, "iCalUID": "5am83o8j20rn00f85ltn207ao7@google.com", "sequence": 0, "reminders": {"useDefault": true}, "eventType": "default", "date": "Monday May 27, 09:00AM-09:30AM"}, {"kind": "calendar#event", "etag": "\"3431592761120000\"", "id": "5am83o8j20rn00f85ltn207ao7_20240603T140000Z", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=NWFtODNvOGoyMHJuMDBmODVsdG4yMDdhbzdfMjAyNDA2MDNUMTQwMDAwWiBzaW1vbi5iZW5pZ2VyaUBt", "created": "2024-05-15T18:06:20.000Z", "updated": "2024-05-15T18:06:20.560Z", "summary": "Faraz weekly", "description": "Meeting with Nick Easton, Lacey Gleason, Faraz Ahmad", "location": "Zoom", "creator": {"email": "simon.benigeri@gmail.com", "self": true}, "organizer": {"email": "simon.benigeri@gmail.com", "self": true}, "start": {"dateTime": "2024-06-03T09:00:00-05:00", "timeZone": "America/Chicago"}, "end": {"dateTime": "2024-06-03T09:30:00-05:00", "timeZone": "America/Chicago"}, "recurringEventId": "5am83o8j20rn00f85ltn207ao7", "originalStartTime": {"dateTime": "2024-06-03T09:00:00-05:00", "timeZone": "America/Chicago"}, "iCalUID": "5am83o8j20rn00f85ltn207ao7@google.com", "sequence": 0, "reminders": {"useDefault": true}, "eventType": "default", "date": "Monday June 03, 09:00AM-09:30AM"}]}
+{
+  "query": "What's happening next Monday?",
+  "n_gram": 1,
+  "top_n": 3,
+  "fields": [
+    "id",
+    "date",
+    "location",
+    "summary",
+    "description"
+  ],
+  "extracted_date": [
+    "Monday May 20"
+  ],
+  "relevant_docs": [
+    {
+      "id": "5am83o8j20rn00f85ltn207ao7_20240520T140000Z",
+      "summary": "Faraz weekly",
+      "description": "Meeting with Nick Easton, Lacey Gleason, Faraz Ahmad",
+      "location": "Zoom",
+      "date": "Monday May 20, 09:00AM-09:30AM"
+    },
+    {
+      "id": "hdha3fnrgp6ohd238v3mjhdivs",
+      "summary": "Reservation at Monteverde Restaurant & Pastificio",
+      "description": "To see detailed information for automatically created events like this one, use the official Google Calendar app. https://g.co/calendar\n\nThis event was created from an email you received in Gmail. https://mail.google.com/mail?extsrc=cal&plid=ACUX6DM82GSXjW5dy-xod2owY92KuyxycEHCMdI\n",
+      "location": "Monteverde Restaurant & Pastificio, 1020 W Madison St, Chicago, IL 60607",
+      "date": "Saturday May 25, 01:15PM-02:15PM"
+    },
+    {
+      "id": "_6tlnaqrle5p6cpb4dhmj4phpehmj4draddq6cc9o65i6gor6e1njedjiecr3eoj9ecsmgs3kelk6keb1dgomopra6tn68s34ddnmgsbbddo30",
+      "summary": "Flight to New York (DL 3715)",
+      "description": "To see detailed information for automatically created events like this one, use the official Google Calendar app. https://g.co/calendar\n\nThis event was created from an email you received in Gmail. https://mail.google.com/mail?extsrc=cal&plid=ACUX6DPWJM9rh7wTWBI8GaH3nLr4swfEOaSItdQ\n",
+      "location": "Chicago ORD",
+      "date": "Monday June 03, 02:02PM-04:30PM"
+    }
+  ]
+}

@@ -1,1 +1,37 @@
-{"query": "Meet me tomorrow", "n_gram": 1, "top_n": 3, "fields": ["date", "summary", "location"], "extracted_date": ["Thursday May 16"], "relevant_docs": [{"kind": "calendar#event", "etag": "\"3430411203246000\"", "id": "1u7rfgbabiaae1t8a9mpfku4a1_20240516T203000Z", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=MXU3cmZnYmFiaWFhZTF0OGE5bXBma3U0YTFfMjAyNDA1MTZUMjAzMDAwWiBzaW1vbi5iZW5pZ2VyaUBt", "created": "2024-05-02T19:59:38.000Z", "updated": "2024-05-08T22:00:01.623Z", "summary": "Conversational AI", "location": "Frances Searle 3220", "creator": {"email": "simon.benigeri@gmail.com", "self": true}, "organizer": {"email": "simon.benigeri@gmail.com", "self": true}, "start": {"dateTime": "2024-05-16T15:30:00-05:00", "timeZone": "America/Chicago"}, "end": {"dateTime": "2024-05-16T17:00:00-05:00", "timeZone": "America/Chicago"}, "recurringEventId": "1u7rfgbabiaae1t8a9mpfku4a1", "originalStartTime": {"dateTime": "2024-05-16T15:30:00-05:00", "timeZone": "America/Chicago"}, "iCalUID": "1u7rfgbabiaae1t8a9mpfku4a1@google.com", "sequence": 0, "reminders": {"useDefault": true}, "eventType": "default", "date": "Thursday May 16, 03:30PM-05:00PM"}, {"kind": "calendar#event", "etag": "\"3431593160006000\"", "id": "0tnbssueek66ruh6c1o3aj9ssh", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=MHRuYnNzdWVlazY2cnVoNmMxbzNhajlzc2ggc2ltb24uYmVuaWdlcmlAbQ", "created": "2024-05-15T18:09:40.000Z", "updated": "2024-05-15T18:09:40.003Z", "summary": "EMNLP Deadline", "creator": {"email": "simon.benigeri@gmail.com", "self": true}, "organizer": {"email": "simon.benigeri@gmail.com", "self": true}, "start": {"dateTime": "2024-06-16T00:00:00-05:00", "timeZone": "America/Chicago"}, "end": {"dateTime": "2024-06-16T00:00:00-05:00", "timeZone": "America/Chicago"}, "iCalUID": "0tnbssueek66ruh6c1o3aj9ssh@google.com", "sequence": 0, "reminders": {"useDefault": false, "overrides": [{"method": "email", "minutes": 30240}, {"method": "email", "minutes": 10080}, {"method": "email", "minutes": 20160}]}, "eventType": "default", "date": "Sunday June 16, 12:00AM-12:00AM"}, {"kind": "calendar#event", "etag": "\"3430411203246000\"", "id": "1u7rfgbabiaae1t8a9mpfku4a1_20240523T203000Z", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=MXU3cmZnYmFiaWFhZTF0OGE5bXBma3U0YTFfMjAyNDA1MjNUMjAzMDAwWiBzaW1vbi5iZW5pZ2VyaUBt", "created": "2024-05-02T19:59:38.000Z", "updated": "2024-05-08T22:00:01.623Z", "summary": "Conversational AI", "location": "Frances Searle 3220", "creator": {"email": "simon.benigeri@gmail.com", "self": true}, "organizer": {"email": "simon.benigeri@gmail.com", "self": true}, "start": {"dateTime": "2024-05-23T15:30:00-05:00", "timeZone": "America/Chicago"}, "end": {"dateTime": "2024-05-23T17:00:00-05:00", "timeZone": "America/Chicago"}, "recurringEventId": "1u7rfgbabiaae1t8a9mpfku4a1", "originalStartTime": {"dateTime": "2024-05-23T15:30:00-05:00", "timeZone": "America/Chicago"}, "iCalUID": "1u7rfgbabiaae1t8a9mpfku4a1@google.com", "sequence": 0, "reminders": {"useDefault": true}, "eventType": "default", "date": "Thursday May 23, 03:30PM-05:00PM"}]}
+{
+  "query": "Meet me tomorrow",
+  "n_gram": 1,
+  "top_n": 3,
+  "fields": [
+    "id",
+    "date",
+    "location",
+    "summary",
+    "description"
+  ],
+  "extracted_date": [
+    "Friday May 17"
+  ],
+  "relevant_docs": [
+    {
+      "id": "5am83o8j20rn00f85ltn207ao7_20240617T140000Z",
+      "summary": "Faraz weekly",
+      "description": "Meeting with Nick Easton, Lacey Gleason, Faraz Ahmad",
+      "location": "Zoom",
+      "date": "Monday June 17, 09:00AM-09:30AM"
+    },
+    {
+      "id": "_6tlnaqrle5p6cpb4dhmj4phpehmm6rreddl34d31c5pmqprc75gjgojfdsp6ic3g6to70sr3cdl34rb2e5q3cp1pe9mmmqpk6ti6csb1d9kj0",
+      "summary": "Flight to Paris (AF 137)",
+      "description": "To see detailed information for automatically created events like this one, use the official Google Calendar app. https://g.co/calendar\n\nThis event was created from an email you received in Gmail. https://mail.google.com/mail?extsrc=cal&plid=ACUX6DNUwQZhN3FU0j_7pJ6wbPa3RD0uBoIV6gI\n",
+      "location": "Chicago ORD",
+      "date": "Sunday June 16, 05:15PM - Monday June 17, 01:10AM"
+    },
+    {
+      "id": "1u7rfgbabiaae1t8a9mpfku4a1_20240516T203000Z",
+      "summary": "Conversational AI",
+      "location": "Frances Searle 3220",
+      "date": "Thursday May 16, 03:30PM-05:00PM"
+    }
+  ]
+}

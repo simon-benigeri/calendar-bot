@@ -1,1 +1,34 @@
-{"query": "What's happening today?", "n_gram": 1, "top_n": 3, "fields": ["date", "summary", "location"], "extracted_date": ["Wednesday May 15"], "relevant_docs": [{"kind": "calendar#event", "etag": "\"3431591539982000\"", "id": "19j6rubq3u1e0c4hh3bn6sj4t1_20240515T213000Z", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=MTlqNnJ1YnEzdTFlMGM0aGgzYm42c2o0dDFfMjAyNDA1MTVUMjEzMDAwWiBzaW1vbi5iZW5pZ2VyaUBt", "created": "2024-05-15T17:56:09.000Z", "updated": "2024-05-15T17:56:09.991Z", "summary": "Responsible Conduct in Research", "location": "Technological Institute M164", "creator": {"email": "simon.benigeri@gmail.com", "self": true}, "organizer": {"email": "simon.benigeri@gmail.com", "self": true}, "start": {"dateTime": "2024-05-15T16:30:00-05:00", "timeZone": "America/Chicago"}, "end": {"dateTime": "2024-05-15T18:30:00-05:00", "timeZone": "America/Chicago"}, "recurringEventId": "19j6rubq3u1e0c4hh3bn6sj4t1", "originalStartTime": {"dateTime": "2024-05-15T16:30:00-05:00", "timeZone": "America/Chicago"}, "iCalUID": "19j6rubq3u1e0c4hh3bn6sj4t1@google.com", "sequence": 0, "reminders": {"useDefault": true}, "eventType": "default", "date": "Wednesday May 15, 04:30PM-06:30PM"}, {"kind": "calendar#event", "etag": "\"3431592761120000\"", "id": "5am83o8j20rn00f85ltn207ao7_20240715T140000Z", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=NWFtODNvOGoyMHJuMDBmODVsdG4yMDdhbzdfMjAyNDA3MTVUMTQwMDAwWiBzaW1vbi5iZW5pZ2VyaUBt", "created": "2024-05-15T18:06:20.000Z", "updated": "2024-05-15T18:06:20.560Z", "summary": "Faraz weekly", "description": "Meeting with Nick Easton, Lacey Gleason, Faraz Ahmad", "location": "Zoom", "creator": {"email": "simon.benigeri@gmail.com", "self": true}, "organizer": {"email": "simon.benigeri@gmail.com", "self": true}, "start": {"dateTime": "2024-07-15T09:00:00-05:00", "timeZone": "America/Chicago"}, "end": {"dateTime": "2024-07-15T09:30:00-05:00", "timeZone": "America/Chicago"}, "recurringEventId": "5am83o8j20rn00f85ltn207ao7", "originalStartTime": {"dateTime": "2024-07-15T09:00:00-05:00", "timeZone": "America/Chicago"}, "iCalUID": "5am83o8j20rn00f85ltn207ao7@google.com", "sequence": 0, "reminders": {"useDefault": true}, "eventType": "default", "date": "Monday July 15, 09:00AM-09:30AM"}, {"kind": "calendar#event", "etag": "\"3431591539982000\"", "id": "19j6rubq3u1e0c4hh3bn6sj4t1_20240522T213000Z", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=MTlqNnJ1YnEzdTFlMGM0aGgzYm42c2o0dDFfMjAyNDA1MjJUMjEzMDAwWiBzaW1vbi5iZW5pZ2VyaUBt", "created": "2024-05-15T17:56:09.000Z", "updated": "2024-05-15T17:56:09.991Z", "summary": "Responsible Conduct in Research", "location": "Technological Institute M164", "creator": {"email": "simon.benigeri@gmail.com", "self": true}, "organizer": {"email": "simon.benigeri@gmail.com", "self": true}, "start": {"dateTime": "2024-05-22T16:30:00-05:00", "timeZone": "America/Chicago"}, "end": {"dateTime": "2024-05-22T18:30:00-05:00", "timeZone": "America/Chicago"}, "recurringEventId": "19j6rubq3u1e0c4hh3bn6sj4t1", "originalStartTime": {"dateTime": "2024-05-22T16:30:00-05:00", "timeZone": "America/Chicago"}, "iCalUID": "19j6rubq3u1e0c4hh3bn6sj4t1@google.com", "sequence": 0, "reminders": {"useDefault": true}, "eventType": "default", "date": "Wednesday May 22, 04:30PM-06:30PM"}]}
+{
+  "query": "What's happening today?",
+  "n_gram": 1,
+  "top_n": 3,
+  "fields": [
+    "id",
+    "date",
+    "location",
+    "summary",
+    "description"
+  ],
+  "extracted_date": [
+    "Thursday May 16"
+  ],
+  "relevant_docs": [
+    {
+      "id": "1u7rfgbabiaae1t8a9mpfku4a1_20240516T203000Z",
+      "summary": "Conversational AI",
+      "location": "Frances Searle 3220",
+      "date": "Thursday May 16, 03:30PM-05:00PM"
+    },
+    {
+      "id": "0tnbssueek66ruh6c1o3aj9ssh",
+      "summary": "EMNLP Deadline",
+      "date": "Sunday June 16, 12:00AM-12:00AM"
+    },
+    {
+      "id": "1u7rfgbabiaae1t8a9mpfku4a1_20240523T203000Z",
+      "summary": "Conversational AI",
+      "location": "Frances Searle 3220",
+      "date": "Thursday May 23, 03:30PM-05:00PM"
+    }
+  ]
+}

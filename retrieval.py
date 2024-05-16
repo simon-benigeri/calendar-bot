@@ -123,14 +123,14 @@ def tokenize(text, n=1):
 
 if __name__=="__main__":
 
-    calendar = json.load(open("my_calendar_data.json"))
+    calendar = json.load(open("my_calendar_data_filtered.json"))
 
     # # Example cases
     queries = ["What's happening Wednesday?", "What's happening next Monday?", "Remind me every Tuesday", "Schedule for this weekend", "What's happening today?", "Meet me tomorrow", "Let's plan for this weekend", "Schedule for next week"]
 
     docs = calendar
 
-    fields = ["date", "summary", "location"]
+    fields = ["id", "date", "location", "summary", "description"]
     n_gram = 1
     top_n = 3
     for idx, query in enumerate(queries):
@@ -149,7 +149,7 @@ if __name__=="__main__":
             
         }
         with open(f'query_{idx}.json', 'w') as f:
-            json.dump(response, f)
+            json.dump(response, f, indent=2)
 
 
     # query = "What is going on today?"
