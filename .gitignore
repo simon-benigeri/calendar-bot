@@ -1,3 +1,4 @@
+query_*_*.json
 credentials.json
 credentials-desktop.json
 token.json
@@ -5,6 +6,8 @@ backend.py
 gemini_api_key
 mistral_backend.py
 my_calendar_data.json
+app.py
+my_calendar_data_filtered.json
 setup_googlecal.md
 assets/credentials.png
 assets/Enable_API.png
@@ -178,5 +181,4 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-app.py
-my_calendar_data_filtered.json
+

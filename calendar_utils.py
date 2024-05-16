@@ -90,7 +90,7 @@ if __name__ == "__main__":
         "-f",
         "--filter",
         action="store_true",
-        help=f"Filter calendar events to keep keys: {['id', 'date', 'location', 'summary', 'description']}.",
+        help=f"Filter calendar events to keep keys: {['id', 'date', 'start', 'location', 'summary', 'description']}.",
     )
 
     args = parser.parse_args()

@@ -86,23 +86,62 @@ def append_dates_to_query(query):
     return updated_query
     
 
+# def bm25_retrieve_from_json(docs, query, fields, n_gram=1, top_n=5):
+#     # Combine specified fields and tokenize, using n-grams up to length of the longest phrase
+#     tokenized_docs = [tokenize("\n".join(doc[field] for field in fields if field in doc), n=n_gram) for doc in docs]
+#     bm25 = BM25Okapi(tokenized_docs)
+
+#     # Tokenize query
+#     tokenized_query = tokenize(query)
+
+#     # Get scores and retrieve top N documents
+#     scores = bm25.get_scores(tokenized_query)
+
+#     # Update documents with their scores
+#     for score, doc in zip(scores, docs):
+#         doc['bm25_score'] = score
+
+#     top_indexes = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_n]
+#     return [docs[i] for i in top_indexes]
+
 def bm25_retrieve_from_json(docs, query, fields, n_gram=1, top_n=5):
-    # Combine specified fields and tokenize, using n-grams up to length of the longest phrase
-    tokenized_docs = [tokenize("\n".join(doc[field] for field in fields if field in doc), n=n_gram) for doc in docs]
+    # Extract dates and append to the query for more context
+    updated_query = append_dates_to_query(query)
+    extracted_date = extract_date(query)
+    
+    # Tokenization of documents
+    tokenized_docs = [tokenize("\n".join(str(doc[field]) for field in fields if field in doc and field not in ['date', 'start']), n=n_gram) for doc in docs]
     bm25 = BM25Okapi(tokenized_docs)
 
-    # Tokenize query
-    tokenized_query = tokenize(query)
+    # Tokenization of the query
+    tokenized_query = tokenize(updated_query)
 
-    # Get scores and retrieve top N documents
-    scores = bm25.get_scores(tokenized_query)
+    # Compute BM25 scores
+    bm25_scores = bm25.get_scores(tokenized_query)
 
-    # Update documents with their scores
-    for score, doc in zip(scores, docs):
-        doc['bm25_score'] = score
+    # Calculate scores and add to docs
+    for doc, bm25_score in zip(docs, bm25_scores):
+        date_score = 1 if extracted_date and extracted_date in doc.get('date', '') else 0
+        doc['date_score'] = date_score
+        doc['bm25_score'] = bm25_score
 
-    top_indexes = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_n]
-    return [docs[i] for i in top_indexes]
+    # First, retrieve all documents with date_score greater than 1
+    retrieved_docs = [doc for doc in docs if doc['date_score'] > 0]
+
+    # If there are not enough documents retrieved, fill up the rest with those having the highest BM25 scores
+    if len(retrieved_docs) < top_n:
+        remaining_docs_needed = top_n - len(retrieved_docs)
+        remaining_docs = [doc for doc in sorted(docs, key=lambda x: x['bm25_score'], reverse=True) if doc not in retrieved_docs][:remaining_docs_needed]
+        retrieved_docs.extend(remaining_docs)
+    
+    # Sort documents by dateTime within the 'start' field
+    retrieved_docs.sort(key=lambda doc: datetime.strptime(doc['start']['dateTime'], '%Y-%m-%dT%H:%M:%S%z'))
+
+    # Drop the 'start' field from each document
+    for doc in retrieved_docs:
+        doc.pop('start', None)  # Safely remove the 'start' field without causing an error if it's missing
+
+    return retrieved_docs
 
 
 
@@ -136,13 +175,14 @@ if __name__=="__main__":
     docs = calendar
 
     fields = ["id", "date", "location", "summary", "description"]
-    n_gram = 1
+    n_gram = 3
     top_n = 3
     for idx, query in enumerate(queries):
         extracted_date = extract_date(query)
         print(f"Query: '{query}' -> Extracted Date: {extracted_date}")
         enriched_query = append_dates_to_query(query)
         print(f"Enriched Query: {enriched_query}")
+        top_n = max(top_n, len(extracted_date))
         relevant_docs = bm25_retrieve_from_json(docs, enriched_query, fields, n_gram=n_gram, top_n=top_n)
         response = {
             "query": query,
@@ -153,7 +193,7 @@ if __name__=="__main__":
             "relevant_docs": relevant_docs,
             
         }
-        with open(f'query_{idx}.json', 'w') as f:
+        with open(f'query_{idx}_n_{n_gram}_top_{top_n}.json', 'w') as f:
             json.dump(response, f, indent=2)
 
 
