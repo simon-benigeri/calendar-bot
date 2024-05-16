@@ -17,21 +17,24 @@
     {
       "id": "0tnbssueek66ruh6c1o3aj9ssh",
       "summary": "EMNLP Deadline",
-      "date": "Sunday June 16, 12:00AM-12:00AM"
+      "date": "Sunday June 16, 12:00AM-12:00AM",
+      "bm25_score": 2.9501145757236675
     },
     {
       "id": "64cb7954f4b46e099f6a5442",
       "summary": "Arsenal vs Everton (H)",
       "description": "Premier League | Matchweek 38 | TV: Watch live on TV: Check local guides or join us for analysis and live commentary in The Breakdown Live on the Arsenal App and Arsenal.com | Join In #ARSEVE\n\nShop Arsenal Direct\nhttps://ecal.ai/f/lvDnn/2nZGW\n\nJoin Membership\nhttps://ecal.ai/f/lvDnm/2nZGW\n\nDownload the Arsenal App\nhttps://ecal.ai/f/lvDnp/2nZGW\n\nLatest Videos\nhttps://ecal.ai/f/lvDnq/2nZGW\n\nLatest News\nhttps://ecal.ai/f/lvDnr/2nZGW\n\nFacebook\nhttps://ecal.ai/f/lvDns/2nZGW\n\nX\nhttps://ecal.ai/f/lvDnt/2nZGW\n\nInstagram\nhttps://ecal.ai/f/lvDnv/2nZGW\n\nTikTok\nhttps://ecal.ai/f/lvDnw/2nZGW\n\nManage my ECAL\nhttps://ecal.ai/f/n5zWL/2nZGW\n\n",
       "location": "Emirates Stadium, London",
-      "date": "Sunday May 19, 10:00AM-12:00PM"
+      "date": "Sunday May 19, 10:00AM-12:00PM",
+      "bm25_score": 2.4390277029317526
     },
     {
       "id": "hdha3fnrgp6ohd238v3mjhdivs",
       "summary": "Reservation at Monteverde Restaurant & Pastificio",
       "description": "To see detailed information for automatically created events like this one, use the official Google Calendar app. https://g.co/calendar\n\nThis event was created from an email you received in Gmail. https://mail.google.com/mail?extsrc=cal&plid=ACUX6DM82GSXjW5dy-xod2owY92KuyxycEHCMdI\n",
       "location": "Monteverde Restaurant & Pastificio, 1020 W Madison St, Chicago, IL 60607",
-      "date": "Saturday May 25, 01:15PM-02:15PM"
+      "date": "Saturday May 25, 01:15PM-02:15PM",
+      "bm25_score": 2.198138941008264
     }
   ]
 }

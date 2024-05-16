@@ -96,6 +96,11 @@ def bm25_retrieve_from_json(docs, query, fields, n_gram=1, top_n=5):
 
     # Get scores and retrieve top N documents
     scores = bm25.get_scores(tokenized_query)
+
+    # Update documents with their scores
+    for score, doc in zip(scores, docs):
+        doc['bm25_score'] = score
+
     top_indexes = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_n]
     return [docs[i] for i in top_indexes]
 

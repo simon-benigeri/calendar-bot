@@ -18,20 +18,23 @@
       "summary": "Faraz weekly",
       "description": "Meeting with Nick Easton, Lacey Gleason, Faraz Ahmad",
       "location": "Zoom",
-      "date": "Monday June 17, 09:00AM-09:30AM"
+      "date": "Monday June 17, 09:00AM-09:30AM",
+      "bm25_score": 2.7507446614054594
     },
     {
       "id": "_6tlnaqrle5p6cpb4dhmj4phpehmm6rreddl34d31c5pmqprc75gjgojfdsp6ic3g6to70sr3cdl34rb2e5q3cp1pe9mmmqpk6ti6csb1d9kj0",
       "summary": "Flight to Paris (AF 137)",
       "description": "To see detailed information for automatically created events like this one, use the official Google Calendar app. https://g.co/calendar\n\nThis event was created from an email you received in Gmail. https://mail.google.com/mail?extsrc=cal&plid=ACUX6DNUwQZhN3FU0j_7pJ6wbPa3RD0uBoIV6gI\n",
       "location": "Chicago ORD",
-      "date": "Sunday June 16, 05:15PM - Monday June 17, 01:10AM"
+      "date": "Sunday June 16, 05:15PM - Monday June 17, 01:10AM",
+      "bm25_score": 1.624198654183422
     },
     {
       "id": "1u7rfgbabiaae1t8a9mpfku4a1_20240516T203000Z",
       "summary": "Conversational AI",
       "location": "Frances Searle 3220",
-      "date": "Thursday May 16, 03:30PM-05:00PM"
+      "date": "Thursday May 16, 03:30PM-05:00PM",
+      "bm25_score": 0.3439305000404738
     }
   ]
 }

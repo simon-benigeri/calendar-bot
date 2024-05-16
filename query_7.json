@@ -23,19 +23,22 @@
       "id": "1u7rfgbabiaae1t8a9mpfku4a1_20240523T203000Z",
       "summary": "Conversational AI",
       "location": "Frances Searle 3220",
-      "date": "Thursday May 23, 03:30PM-05:00PM"
+      "date": "Thursday May 23, 03:30PM-05:00PM",
+      "bm25_score": 8.705334874498812
     },
     {
       "id": "19j6rubq3u1e0c4hh3bn6sj4t1_20240522T213000Z",
       "summary": "Responsible Conduct in Research",
       "location": "Technological Institute M164",
-      "date": "Wednesday May 22, 04:30PM-06:30PM"
+      "date": "Wednesday May 22, 04:30PM-06:30PM",
+      "bm25_score": 8.645007104038223
     },
     {
       "id": "1u7rfgbabiaae1t8a9mpfku4a1_20240521T203000Z",
       "summary": "Conversational AI",
       "location": "Frances Searle 3220",
-      "date": "Tuesday May 21, 03:30PM-05:00PM"
+      "date": "Tuesday May 21, 03:30PM-05:00PM",
+      "bm25_score": 7.146407273306364
     }
   ]
 }

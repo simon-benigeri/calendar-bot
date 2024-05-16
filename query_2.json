@@ -17,19 +17,22 @@
       "id": "1u7rfgbabiaae1t8a9mpfku4a1_20240521T203000Z",
       "summary": "Conversational AI",
       "location": "Frances Searle 3220",
-      "date": "Tuesday May 21, 03:30PM-05:00PM"
+      "date": "Tuesday May 21, 03:30PM-05:00PM",
+      "bm25_score": 6.596447334110065
     },
     {
       "id": "1dho04kd5nc2tkk34vi6ocjekn_20240521T220000Z",
       "summary": "Mathematical Foundations of ML",
       "location": "Technological Institute LG52",
-      "date": "Tuesday May 21, 05:00PM-08:00PM"
+      "date": "Tuesday May 21, 05:00PM-08:00PM",
+      "bm25_score": 6.437794137939595
     },
     {
       "id": "1u7rfgbabiaae1t8a9mpfku4a1_20240528T203000Z",
       "summary": "Conversational AI",
       "location": "Frances Searle 3220",
-      "date": "Tuesday May 28, 03:30PM-05:00PM"
+      "date": "Tuesday May 28, 03:30PM-05:00PM",
+      "bm25_score": 3.3711766221335666
     }
   ]
 }
