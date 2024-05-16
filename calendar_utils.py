@@ -37,6 +37,7 @@ def format_date_description(events):
             date = f"{event_date} - {event_end_date}"
         
         event['date'] = date
+        event['start'] = event["start"]["dateTime"]
     
     return events
 
@@ -75,7 +76,6 @@ def get_calendar_events():
     events = format_date_description(events)
 
     for event in events:
-        # start = event["start"].get("dateTime", event["start"].get("date"))
         event_date = event["date"]
         print(event_date, event["summary"])
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     events = get_calendar_events()
     print(f"Retrieving {len(events)} events.")
     path = "my_calendar_data.json"
-    keys_to_keep = ['id', 'date', 'location', 'summary', 'description']
+    keys_to_keep = ['id', 'date', 'start', 'location', 'summary', 'description']
     if args.filter:
         events = filter_event_keys(events, keys_to_keep)
         path = "my_calendar_data_filtered.json"
