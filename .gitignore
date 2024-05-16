@@ -1,4 +1,4 @@
-query_*_*.json
+query*.json
 credentials.json
 credentials-desktop.json
 token.json
