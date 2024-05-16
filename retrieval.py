@@ -107,22 +107,21 @@ def extract_date(query, date_format="%A %B %d"):
         return []
 
 
-def append_dates_to_query(query):
-    # Extract dates from the query
-    dates = extract_date(query)
+# def append_dates_to_query(query):
+#     # Extract dates from the query
+#     dates = extract_date(query)
 
-    # Append extracted dates to the query, if any
-    if dates:
-        updated_query = f"{query} on {' and '.join(dates)}"
-    else:
-        updated_query = query
+#     # Append extracted dates to the query, if any
+#     if dates:
+#         updated_query = f"{query} on {' and '.join(dates)}"
+#     else:
+#         updated_query = query
 
-    return updated_query
+#     return updated_query
 
 
 def bm25_retrieve_from_json(docs, query, fields, n_gram=1, top_n=5):
-    # Extract dates and append to the query for more context
-    updated_query = append_dates_to_query(query)
+    # Extract dates
     extracted_dates = extract_date(query)
 
     # Tokenization of documents
@@ -140,7 +139,7 @@ def bm25_retrieve_from_json(docs, query, fields, n_gram=1, top_n=5):
     bm25 = BM25Okapi(tokenized_docs)
 
     # Tokenization of the query
-    tokenized_query = tokenize(updated_query)
+    tokenized_query = tokenize(query)
 
     # Compute BM25 scores
     bm25_scores = bm25.get_scores(tokenized_query)
@@ -247,20 +246,6 @@ if __name__ == "__main__":
     top_n = 3
     for idx, query in enumerate(queries):
         response = retrieve_docs(query, docs, n_gram, top_n, fields)
-        # extracted_dates = extract_date(query)
-        # # print(f"Query: '{query}' -> Extracted Dates: {extracted_dates}")
-        # # enriched_query = append_dates_to_query(query)
-        # # print(f"Enriched Query: {enriched_query}")
-        # relevant_docs = bm25_retrieve_from_json(
-        #     docs, query, fields, n_gram=n_gram, top_n=top_n
-        # )
-        # response = {
-        #     "query": query,
-        #     "n_gram": n_gram,
-        #     "top_n": top_n,
-        #     "fields": fields,
-        #     "extracted_dates": extracted_dates,
-        #     "relevant_docs": relevant_docs,
-        # }
+        print(f"Query: '{query}' -> Extracted Dates: {response.get('extracted_dates', [])}")
         with open(f"query_data/query_{idx}_n_{n_gram}_top_{top_n}.json", "w") as f:
             json.dump(response, f, indent=2)

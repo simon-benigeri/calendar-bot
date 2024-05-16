@@ -76,35 +76,6 @@ CALENDAR_QA_PROMPT = """\
     Please ensure your responses utilize the calendar provided to accurately answer inquiries. Do not seek additional personal details unless the calendar data does not cover the user's question.
     """
 
-# CALENDAR_QA_PROMPT = """\
-#     ### Calendar Question Answering Task
-
-#     **Today's Date**: {date}
-#     - Always respond with the provided date when asked about today's date.
-
-#     **Task**: Directly answer the user's questions using the calendar information provided as JSON. Do not request additional information unless the query is ambiguous or incomplete based on the available calendar data.
-
-#     **Instructions**:
-#     1. Use today's date from above when asked for the date.
-#     2. For questions about specific events, refer directly to the calendar entries to provide accurate dates, times, and details.
-
-#     **User Calendar**:
-#     {calendar}
-
-#     Please ensure your responses utilize the JSON calendar provided to accurately answer inquiries. Do not seek additional personal details unless the calendar data does not cover the user's question.
-#     """
-
-
-def extract_date(query):
-    # Attempt to parse a date from the query
-    date = dateparser.parse(query, settings={"PREFER_DATES_FROM": "future"})
-    if date:
-        return date.strftime("%Y-%m-%d")
-    else:
-        # Default to today's date if no date is found
-        # return datetime.now().strftime("%Y-%m-%d")
-        return None
-
 
 def extract_most_frequent_intent(response):
     # Define the patterns to search for explicit intent labels
