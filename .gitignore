@@ -1,4 +1,5 @@
 query*.json
+query_data/
 credentials.json
 credentials-desktop.json
 token.json
