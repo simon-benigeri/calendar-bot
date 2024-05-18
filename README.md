@@ -63,8 +63,5 @@ To download the calendar data:
 ### 6. Start chatting
 1. Start Ollama on your local machine
 2. To start chatting with gemini:  
-`python retrieval_bot.py -g`
-
-
-
+`python retrieval_bot.py -g` or `python retrieval_bot.py -g -v` if you want the intent classifier output.
 
