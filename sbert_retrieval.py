@@ -1,16 +1,34 @@
 import json
 from datetime import datetime, timedelta
 import dateparser
-
 from typing import List, Dict
+import torch
+from transformers import AutoTokenizer, AutoModel
+from annoy import AnnoyIndex
 
-from rank_bm25 import BM25Okapi
-import nltk
-from nltk.corpus import stopwords
-from nltk.util import ngrams
+# Initialize tokenizer and model
+tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
 
-nltk.download("punkt")
-nltk.download("stopwords")
+
+def get_embeddings(text):
+    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    embeddings = outputs.last_hidden_state.mean(dim=1)
+    return embeddings.squeeze().numpy()
+
+
+def build_annoy_index(
+    docs, text_fields: List[str], embedding_dim: int = 384, n_trees: int = 10
+):
+    index = AnnoyIndex(embedding_dim, "angular")
+    for i, doc in enumerate(docs):
+        doc_text = " ".join([str(doc.get(field, "")) for field in text_fields])
+        embedding = get_embeddings(doc_text)
+        index.add_item(doc["index_id"], embedding)
+    index.build(n_trees)
+    return index
 
 
 def get_next_weekday(start_date, weekday):
@@ -107,45 +125,9 @@ def extract_date(query, date_format="%A %B %d"):
         return []
 
 
-# def append_dates_to_query(query):
-#     # Extract dates from the query
-#     dates = extract_date(query)
-
-#     # Append extracted dates to the query, if any
-#     if dates:
-#         updated_query = f"{query} on {' and '.join(dates)}"
-#     else:
-#         updated_query = query
-
-#     return updated_query
-
-
-def bm25_retrieve_from_json(docs, query, fields, n_gram=1, top_n=5):
-    # Extract dates
+def retrieve_with_dates(docs, query):
     extracted_dates = extract_date(query)
-
-    # Tokenization of documents
-    tokenized_docs = [
-        tokenize(
-            "\n".join(
-                str(doc[field])
-                for field in fields
-                if field in doc and field not in ["date", "start"]
-            ),
-            n=n_gram,
-        )
-        for doc in docs
-    ]
-    bm25 = BM25Okapi(tokenized_docs)
-
-    # Tokenization of the query
-    tokenized_query = tokenize(query)
-
-    # Compute BM25 scores
-    bm25_scores = bm25.get_scores(tokenized_query)
-
-    # Calculate scores and add to docs
-    for doc, bm25_score in zip(docs, bm25_scores):
+    for doc in docs:
         date_score = (
             1
             if any(
@@ -155,70 +137,53 @@ def bm25_retrieve_from_json(docs, query, fields, n_gram=1, top_n=5):
             else 0
         )
         doc["date_score"] = date_score
-        doc["bm25_score"] = bm25_score
 
-    # First, retrieve all documents with date_score greater than 1
-    retrieved_docs = [doc for doc in docs if doc["date_score"] > 0]
-
-    # If there are not enough documents retrieved, fill up the rest with those having the highest BM25 scores
-    if len(retrieved_docs) < top_n:
-        remaining_docs_needed = top_n - len(retrieved_docs)
-        remaining_docs = [
-            doc
-            for doc in sorted(docs, key=lambda doc: doc["bm25_score"], reverse=True)
-            if doc not in retrieved_docs
-        ][:remaining_docs_needed]
-        retrieved_docs.extend(remaining_docs)
-
-    retrieved_docs = sorted(retrieved_docs, key=lambda doc: doc.get("start", ""))
-
-    # Drop the 'start' field from each document
-    for doc in retrieved_docs:
-        doc.pop(
-            "start", None
-        )  # Safely remove the 'start' field without causing an error if it's missing
-
-    return retrieved_docs
+    return [doc for doc in docs if doc["date_score"] > 0], extracted_dates
 
 
-def tokenize(text, n=1):
-    # Tokenize the text
-    words = nltk.word_tokenize(text.lower())
+def retrieve_with_sbert(query, docs, index, top_n=5, exclude_ids=set()):
+    query_embedding = get_embeddings(query)
+    nearest_ids, scores = index.get_nns_by_vector(
+        query_embedding, len(docs), include_distances=True
+    )  # Query all documents
 
-    # Filter out stopwords
-    filtered_words = [word for word in words if word not in stopwords.words("english")]
+    # Assign scores to all documents immediately
+    for doc_id, score in zip(nearest_ids, scores):
+        docs[doc_id]["sbert_score"] = score
 
-    # Calculate n if not provided, assuming the max length for a phrase like "Saturday May 18"
-    if n is None:
-        n = len(filtered_words)
+    # Filter out excluded documents and select the top scoring ones
+    scored_docs = [docs[i] for i in nearest_ids if docs[i]["id"] not in exclude_ids]
 
-    # Generate unigrams and up to n-grams
-    all_ngrams = []
-    for i in range(1, n + 1):
-        generated_ngrams = ngrams(filtered_words, i)
-        all_ngrams.extend([" ".join(gram) for gram in generated_ngrams])
+    # Sort by SBERT score to get the best results
+    scored_docs.sort(key=lambda doc: doc["sbert_score"])
 
-    return all_ngrams
+    return scored_docs[:top_n]  # Return only top_n results
 
 
-def retrieve_docs(
-    query: str,
-    docs=List[Dict],
-    n_gram=3,
-    top_n=3,
-    fields=["id", "date", "start", "location", "summary", "description"],
-) -> Dict:
-    extracted_dates = extract_date(query)
-    relevant_docs = bm25_retrieve_from_json(
-        docs, query, fields, n_gram=n_gram, top_n=top_n
-    )
+def retrieve_docs(query, docs, index, top_n=3):
+    # Assign SBERT scores to all documents
+    all_docs_scored = retrieve_with_sbert(query, docs, index, top_n=len(docs))
+
+    # Retrieve documents based on date matching
+    date_retrieved_docs, extracted_dates = retrieve_with_dates(docs, query)
+
+    date_retrieved_doc_ids = {doc["id"] for doc in date_retrieved_docs}
+
+    # Filter SBERT scored docs excluding the date-retrieved ones to avoid duplication
+    additional_docs_needed = max(0, top_n - len(date_retrieved_docs))
+
+    additional_sbert_docs = [
+        doc for doc in all_docs_scored if doc["id"] not in date_retrieved_doc_ids
+    ][:additional_docs_needed]
+
+    # Combine date-retrieved docs with additional SBERT docs
+    combined_docs = date_retrieved_docs + additional_sbert_docs
+
     response = {
         "query": query,
-        "n_gram": n_gram,
         "top_n": top_n,
-        "fields": fields,
+        "relevant_docs": combined_docs,  # Ensure we return exactly top_n docs
         "extracted_dates": extracted_dates,
-        "relevant_docs": relevant_docs,
     }
     return response
 
@@ -226,6 +191,14 @@ def retrieve_docs(
 if __name__ == "__main__":
 
     calendar = json.load(open("my_calendar_data_filtered.json"))
+    for i, event in enumerate(calendar):
+        event["index_id"] = i
+
+    # fields = ["id", "date", "start", "location", "summary", "description"]
+    text_fields = ["location", "summary", "description"]
+    top_n = 3
+
+    annoy_index = build_annoy_index(calendar, text_fields)
 
     # # Example cases
     queries = [
@@ -242,15 +215,13 @@ if __name__ == "__main__":
         "When do Arsenal play",
     ]
 
-    docs = calendar
-
-    fields = ["id", "date", "start", "location", "summary", "description"]
-    n_gram = 3
-    top_n = 3
     for idx, query in enumerate(queries):
-        response = retrieve_docs(query, docs, n_gram, top_n, fields)
+        response = retrieve_docs(query, docs=calendar, index=annoy_index, top_n=top_n)
+        print(
+            f"Query: '{query}' -&gt; Relevant Docs: {len(response.get('relevant_docs', []))}"
+        )
         print(
             f"Query: '{query}' -> Extracted Dates: {response.get('extracted_dates', [])}"
         )
-        with open(f"query_data/query_{idx}_n_{n_gram}_top_{top_n}.json", "w") as f:
+        with open(f"query_data/sbert_query_{idx}_top_n_{top_n}.json", "w") as f:
             json.dump(response, f, indent=2)

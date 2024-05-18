@@ -21,7 +21,8 @@ from langchain_core.prompts import (
 
 from langchain_core.messages import HumanMessage, AIMessage
 
-from retrieval import retrieve_docs
+# from retrieval import retrieve_docs
+from sbert_retrieval import retrieve_docs, build_annoy_index
 
 load_dotenv()
 
@@ -110,7 +111,7 @@ async def get_response(chain, input, verbose=True):
     return response
 
 
-async def main(calendar, small_llm, gemini_llm, verbose=False):
+async def main(calendar, annoy_index, small_llm, gemini_llm, top_n, verbose=False):
     chat_history = []
 
     while True:
@@ -148,24 +149,23 @@ async def main(calendar, small_llm, gemini_llm, verbose=False):
         if intent == "ask_date":
             response = f"Today's date is {formatted_date}."
             print(f"Response: {response}")
-        elif intent == "calendar_qa":
+        # elif intent == "calendar_qa":
+        else:
 
             retriever_response = retrieve_docs(
-                query=question,
-                docs=calendar,
-                n_gram=3,
-                top_n=3,
-                fields=["id", "date", "start", "location", "summary", "description"],
+                query=question, docs=calendar, index=annoy_index, top_n=top_n
             )
 
             relevant_docs = retriever_response.get("relevant_docs", {})
-            
+
             if verbose:
                 print(f"DOCUMENTS RETRIEVED: {len(relevant_docs)}")
-                print(f"EXTRACTED DATES: {retriever_response.get('extracted_dates', [])}")
+                print(
+                    f"EXTRACTED DATES: {retriever_response.get('extracted_dates', [])}"
+                )
 
             PROMPT_TEMPLATE = CALENDAR_QA_PROMPT
-            # print(f"rephrased: {question}")
+
             prompt = ChatPromptTemplate.from_messages(
                 [
                     ("human", PROMPT_TEMPLATE),
@@ -203,6 +203,20 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "-n",
+        "--top_n",
+        default=3,
+        help="Top n documents to retrieve.",
+    )
+
+    parser.add_argument(
+        "-f",
+        "--fields",
+        default=["location", "summary", "description"],
+        help="Text fields in calendar for annoy index.",
+    )
+
+    parser.add_argument(
         "-v",
         "--verbose",
         action="store_true",
@@ -211,6 +225,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     calendar = json.load(open("my_calendar_data_filtered.json"))
+    for i, event in enumerate(calendar):
+        event["index_id"] = i
+
+    print("Building index of calendar documents.")
+    annoy_index = build_annoy_index(calendar, args.fields)
 
     if args.gemini:
         gemini_llm = ChatGoogleGenerativeAI(
@@ -225,5 +244,8 @@ if __name__ == "__main__":
         gemini_llm = small_llm
         print("Using Ollama model mistral:instruct.")
 
+
     nest_asyncio.apply()
-    asyncio.run(main(calendar, small_llm, gemini_llm, args.verbose))
+    asyncio.run(
+        main(calendar, annoy_index, small_llm, gemini_llm, args.top_n, args.verbose)
+    )
