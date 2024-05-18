@@ -51,12 +51,19 @@ If you do have a project, select it.
 `pip install -r requirements.txt`  
 
 
-### 4. Run the code
+### 4. Install Ollama and download the model mistral:instruct
+1. Install Ollama from this link: https://ollama.com/download
+2. Open a terminal and run: `ollama run mistral:instruct`. Once the model is downloaded you can close the process.
+ 
+
+### 5. Download the calendar data
 To download the calendar data:  
 `python calendar_utils.py`
 
-To start chatting with Gemini:  
-`python calendar_bot.py`
+### 6. Start chatting
+1. Start Ollama on your local machine
+2. To start chatting with gemini:  
+`python retrieval_bot.py -g`
 
 
 
