@@ -60,6 +60,9 @@ If you do have a project, select it.
 To download the calendar data:  
 `python calendar_utils.py`
 
+To download the calendar data, filtered:  
+`python calendar_utils.py -f`
+
 ### 6. Start chatting
 1. Start Ollama on your local machine
 2. To start chatting with gemini:  

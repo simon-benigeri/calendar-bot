@@ -103,4 +103,4 @@ if __name__ == "__main__":
         events = filter_event_keys(events, keys_to_keep)
         path = "my_calendar_data_filtered.json"
     with open(path, "w") as f:
-        json.dump(events, f)
+        json.dump(events, f, indent=2)
