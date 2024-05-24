@@ -210,7 +210,9 @@ if __name__ == "__main__":
         "Meet me tomorrow",
         "Let's plan for this weekend",
         "Schedule for next week",
-        "When is the match?",
+        "What happened last Thursday?",
+        "Summary of the previous week",
+        "Activities from the past weekend" "When is the match?",
         "When is the football game?",
         "When do Arsenal play",
     ]
