@@ -106,7 +106,7 @@ async def main(
         else:
 
             extracted_dates = extract_dates(
-                query=question, llm=llm, formatted_date=formatted_date
+                query=question, llm=llm, formatted_date=formatted_date, parser=date_parser
             )
 
             retriever_response = retrieve_docs(
