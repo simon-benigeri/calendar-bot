@@ -108,7 +108,7 @@ async def main(
             extracted_dates = extract_dates(
                 query=question, llm=llm, formatted_date=formatted_date, parser=date_parser
             )
-
+            # TODO: check if this didnt break with pydantic
             retriever_response = retrieve_docs(
                 query=question,
                 extracted_dates=extracted_dates,
@@ -122,7 +122,7 @@ async def main(
             if verbose:
                 print(f"N DOCUMENTS RETRIEVED: {len(relevant_docs)}")
                 print(
-                    f"EXTRACTED DATES: {retriever_response.get('extracted_dates', [])}"
+                    f"EXTRACTED DATES: {extracted_dates.extracted_dates}"
                 )
                 print(f"DOCUMENTS RETRIEVED: {json.dumps(relevant_docs, indent=2)}")
 
@@ -134,9 +134,6 @@ async def main(
                 ]
             )
             chain = prompt | llm | StrOutputParser()
-
-            print(type(chain))
-            print(ass)
 
             response = await get_response(
                 chain,
