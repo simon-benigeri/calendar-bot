@@ -27,67 +27,67 @@ from sbert_retrieval import retrieve_docs, build_annoy_index
 load_dotenv()
 
 
-# INTENT_PROMPT = """
-#     ### Prompt for Instruct Model
+INTENT_PROMPT = """
+    ### Prompt for Instruct Model
 
-#     **Task**: Classify the user input into the correct intent based on the provided descriptions and examples. Output only the intent label.
+    **Task**: Classify the user input into the correct intent based on the provided descriptions and examples. Output only the intent label.
 
-#     **INTENTS**:
-#     - `ask_date`: The user is asking for the current date.
-#       - Examples: "What is today's date?", "What day is it today?"
-#     - `calendar_qa`: The user inquires about events on their calendar.
-#       - Examples: "What do I have going on today?", "When is {{EVENT}}?", "What days do I have {{EVENT}}?", "What time is {{EVENT}}", "When is my next class?", "Where is my Conversational AI class?", "What is my schedule like on {{DATE}}?", "What is happening today?", "What is going on this weekend?", "What is going on next week?"
+    **INTENTS**:
+    - `ask_date`: The user is asking for the current date.
+      - Examples: "What is today's date?", "What day is it today?"
+    - `calendar_qa`: The user inquires about events on their calendar.
+      - Examples: "What do I have going on today?", "When is {{EVENT}}?", "What days do I have {{EVENT}}?", "What time is {{EVENT}}", "When is my next class?", "Where is my Conversational AI class?", "What is my schedule like on {{DATE}}?", "What is happening today?", "What is going on this weekend?", "What is going on next week?"
 
-#     **Input**: "{question}"
+    **Input**: "{question}"
 
-#     **Expected Output**:
-#     - If the user input is about asking for the date, output `ask_date`.
-#     - If the user input is about querying calendar events, output `calendar_qa`.
+    **Expected Output**:
+    - If the user input is about asking for the date, output `ask_date`.
+    - If the user input is about querying calendar events, output `calendar_qa`.
 
-#     ### Example
+    ### Example
 
-#     **Input**: "Can you tell me what today is?"
-#     **Output**: `ask_date`
-#     """
-INTENT_PROMPT = prompt = """
-### TASK DESCRIPTION
+    **Input**: "Can you tell me what today is?"
+    **Output**: `ask_date`
+    """
+# INTENT_PROMPT = prompt = """
+# ### TASK DESCRIPTION
 
-**Task**: Classify the user input into the correct intent based on the provided descriptions and examples. Output only the intent label.
+# **Task**: Classify the user input into the correct intent based on the provided descriptions and examples. Output only the intent label.
 
-**INTENTS**:
-- `ask_date`: The user is asking for the current date.
-- `calendar_qa`: The user inquires about events on their calendar.
+# **INTENTS**:
+# - `ask_date`: The user is asking for the current date.
+# - `calendar_qa`: The user inquires about events on their calendar.
 
-**Expected Output**:
-- If the user input is about asking for the date, output `ask_date`.
-- If the user input is about querying calendar events, output `calendar_qa`.
+# **Expected Output**:
+# - If the user input is about asking for the date, output `ask_date`.
+# - If the user input is about querying calendar events, output `calendar_qa`.
 
-### Example
+# ### Example
 
-- **Input**: "What is today's date?"
-  **Output**: `ask_date`
-- **Input**: "What day is it today?"
-  **Output**: `ask_date`
-- **Input**: "Can you tell me what today is?"
-  **Output**: `ask_date`
-- **Input**: "What do I have going on today?"
-  **Output**: `calendar_qa`
-- **Input**: "When is my next class?"
-  **Output**: `calendar_qa`
-- **Input**: "Where is my Conversational AI class?"
-  **Output**: `calendar_qa`
-- **Input**: "What is my schedule like on June 25th?"
-  **Output**: `calendar_qa`
-- **Input**: "What is happening today?"
-  **Output**: `calendar_qa`
-- **Input**: "What is going on this weekend?"
-  **Output**: `calendar_qa`
-- **Input**: "What is going on next week?"
-  **Output**: `calendar_qa`
+# - **Input**: "What is today's date?"
+#   **Output**: `ask_date`
+# - **Input**: "What day is it today?"
+#   **Output**: `ask_date`
+# - **Input**: "Can you tell me what today is?"
+#   **Output**: `ask_date`
+# - **Input**: "What do I have going on today?"
+#   **Output**: `calendar_qa`
+# - **Input**: "When is my next class?"
+#   **Output**: `calendar_qa`
+# - **Input**: "Where is my Conversational AI class?"
+#   **Output**: `calendar_qa`
+# - **Input**: "What is my schedule like on June 25th?"
+#   **Output**: `calendar_qa`
+# - **Input**: "What is happening today?"
+#   **Output**: `calendar_qa`
+# - **Input**: "What is going on this weekend?"
+#   **Output**: `calendar_qa`
+# - **Input**: "What is going on next week?"
+#   **Output**: `calendar_qa`
   
-**Input**: "{question}"
-**Output**:
-"""
+# **Input**: "{question}"
+# **Output**:
+# """
 
 CALENDAR_QA_PROMPT = """\
     ### Calendar Question Answering Task
@@ -198,10 +198,11 @@ async def main(calendar, annoy_index, small_llm, gemini_llm, top_n, verbose=Fals
             relevant_docs = retriever_response.get("relevant_docs", {})
 
             if verbose:
-                print(f"DOCUMENTS RETRIEVED: {len(relevant_docs)}")
+                print(f"N DOCUMENTS RETRIEVED: {len(relevant_docs)}")
                 print(
                     f"EXTRACTED DATES: {retriever_response.get('extracted_dates', [])}"
                 )
+                print(f"DOCUMENTS RETRIEVED: {json.dumps(relevant_docs, indent=2)}")
 
             PROMPT_TEMPLATE = CALENDAR_QA_PROMPT
 
