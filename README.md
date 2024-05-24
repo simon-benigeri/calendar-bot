@@ -60,8 +60,14 @@ If you do have a project, select it.
 To download the calendar data:  
 `python calendar_utils.py`
 
-To download the calendar data, filtered:  
-`python calendar_utils.py -f`
+```
+-f is a flag to filter the calendar data
+-n provides max number of events to retrieve (default value is 50)
+-p includes past events, from 2 weeks ago
+```
+
+To download the calendar data, filtered, with up to 50 events, including the past 2 weeks:  
+`python calendar_utils.py -f -p -n 50`
 
 ### 6. Start chatting
 1. Start Ollama on your local machine
