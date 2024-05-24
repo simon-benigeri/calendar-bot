@@ -23,6 +23,13 @@ model_choice = "sentence-transformers/all-MiniLM-L6-v2"
 tokenizer = AutoTokenizer.from_pretrained(model_choice)
 model = AutoModel.from_pretrained(model_choice)
 
+embedding_dims_dict = {
+        "sentence-transformers/all-MiniLM-L6-v2": 384,
+        "sentence-transformers/msmarco-bert-base-dot-v5": 768,
+    }
+
+embedding_dims = embedding_dims_dict[model_choice]
+
 
 def get_embeddings(text):
     inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
@@ -45,18 +52,18 @@ def get_embeddings(text):
 
 
 def build_annoy_index(
-    docs, text_fields: List[str], embedding_dim: int = 768, n_trees: int = 10
+    docs, text_fields: List[str], embedding_dim: int = embedding_dims, n_trees: int = 10
 ):
-    start_time = time.time()  # Start timing
+    # start_time = time.time()  # Start timing
     index = AnnoyIndex(embedding_dim, "angular")
     for i, doc in enumerate(docs):
         doc_text = " ".join([str(doc.get(field, "")) for field in text_fields])
         embedding = get_embeddings(doc_text)
         index.add_item(doc["index_id"], embedding)  # Use index i as the item ID
     index.build(n_trees)
-    print(
-        f"Annoy index built in {time.time() - start_time} seconds"
-    )  # Print time taken
+    # print(
+    #     f"Annoy index built in {time.time() - start_time} seconds"
+    # )  # Print time taken
     return index
 
 
@@ -107,7 +114,7 @@ def retrieve_with_sbert(query, docs, index, top_n=5, exclude_ids=set()):
 
 
 def retrieve_docs(query, extracted_dates, docs, index, top_n=3):
-    start_time = time.time()  # Start timing
+    # start_time = time.time()  # Start timing
     # Assign SBERT scores to all documents
     all_docs_scored = retrieve_with_sbert(query, docs, index, top_n=len(docs))
 
@@ -126,9 +133,9 @@ def retrieve_docs(query, extracted_dates, docs, index, top_n=3):
     # Combine date-retrieved docs with additional SBERT docs
     combined_docs = date_retrieved_docs + additional_sbert_docs
 
-    print(
-        f"Retrieval for '{query}' completed in {time.time() - start_time} seconds"
-    )  # Print time taken
+    # print(
+    #     f"Retrieval for '{query}' completed in {time.time() - start_time} seconds"
+    # )  # Print time taken
 
     response = {
         "query": query,
