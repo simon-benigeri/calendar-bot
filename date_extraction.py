@@ -51,9 +51,9 @@ query = {query}
 class Dates(BaseModel):
     extracted_dates: List[str] = Field(description="List of extracted dates in 'Month DD, YYYY' format")
 
-parser = JsonOutputParser(pydantic_object=Dates)
+date_parser = JsonOutputParser(pydantic_object=Dates)
 
-def extract_dates(query, llm, formatted_date, parser:JsonOutputParser=parser, verbose:str=False):
+def extract_dates(query, llm, formatted_date, parser:JsonOutputParser=date_parser, verbose:str=False):
 
     prompt = PromptTemplate(
         template=DATE_EXTRACTION_PROMPT,
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     gemini_llm = ChatGoogleGenerativeAI(
             api_key=os.getenv("GOOGLE_API_KEY"), model="gemini-1.5-pro-latest"
         )
-    parser = JsonOutputParser(pydantic_object=Dates)
+    date_parser = JsonOutputParser(pydantic_object=Dates)
 
     queries = [
         "What's happening Wednesday?",
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     ]
 
     for idx, query in enumerate(queries):
-        response = extract_dates(query, gemini_llm, formatted_date, parser, verbose)
+        response = extract_dates(query, gemini_llm, formatted_date, date_parser, verbose)
         
         print(
             f"Query: '{query}' \n Current Date: {formatted_date} \n -> Extracted Dates: {response.get('extracted_dates', [])}"
