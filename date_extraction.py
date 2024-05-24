@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import langchain
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel, Field
 from typing import List
@@ -48,12 +48,24 @@ Ensure each date is accurately calculated considering today’s date, ensuring t
 query = {query}
 """
 
+
 class Dates(BaseModel):
-    extracted_dates: List[str] = Field(description="List of extracted dates in 'Month DD, YYYY' format")
+    extracted_dates: List[str] = Field(
+        description="List of extracted dates in 'Month DD, YYYY' format"
+    )
 
-date_parser = JsonOutputParser(pydantic_object=Dates)
 
-def extract_dates(query, llm, formatted_date, parser:JsonOutputParser=date_parser, verbose:str=False):
+# date_parser = JsonOutputParser(pydantic_object=Dates)
+date_parser = PydanticOutputParser(pydantic_object=Dates)
+
+
+def extract_dates(
+    query,
+    llm,
+    formatted_date,
+    parser: JsonOutputParser | PydanticOutputParser = date_parser,
+    verbose: str = False,
+):
 
     prompt = PromptTemplate(
         template=DATE_EXTRACTION_PROMPT,
@@ -64,29 +76,31 @@ def extract_dates(query, llm, formatted_date, parser:JsonOutputParser=date_parse
     chain = prompt | llm | parser
 
     response = chain.invoke({"date": formatted_date, "query": query})
-    response["query"] = query
-    response["today"] = formatted_date
+    # response["query"] = query
+    # response["today"] = formatted_date
 
     if verbose:
+        # print(
+        #     f"Current Date: {formatted_date} \n -> Extracted Dates: {response.get('extracted_dates', [])}"
+        # )
         print(
-            f"Current Date: {formatted_date} \n -> Extracted Dates: {response.get('extracted_dates', [])}"
+            f"Query: {query} \n  Current Date: {formatted_date} \n    -> Extracted Dates: {response.extracted_dates}"
         )
-
 
     return response
 
-    
 
 if __name__ == "__main__":
-    verbose = False
+    verbose = True
 
     today = date.today()
     formatted_date = today.strftime("%A, %B %d, %Y")
 
     gemini_llm = ChatGoogleGenerativeAI(
-            api_key=os.getenv("GOOGLE_API_KEY"), model="gemini-1.5-pro-latest"
-        )
-    date_parser = JsonOutputParser(pydantic_object=Dates)
+        api_key=os.getenv("GOOGLE_API_KEY"), model="gemini-1.5-pro-latest"
+    )
+    # date_parser = JsonOutputParser(pydantic_object=Dates)
+    date_parser = PydanticOutputParser(pydantic_object=Dates)
 
     queries = [
         "What's happening Wednesday?",
@@ -99,18 +113,29 @@ if __name__ == "__main__":
         "Schedule for next week",
         "What happened last Thursday?",
         "Summary of the previous week",
-        "Activities from the past weekend", 
+        "Activities from the past weekend",
         "When is the match?",
         "When is the football game?",
         "When do Arsenal play",
     ]
 
     for idx, query in enumerate(queries):
-        response = extract_dates(query, gemini_llm, formatted_date, date_parser, verbose)
-        
-        print(
-            f"Query: '{query}' \n Current Date: {formatted_date} \n -> Extracted Dates: {response.get('extracted_dates', [])}"
+        response = extract_dates(
+            query, gemini_llm, formatted_date, date_parser, verbose
         )
 
+        # print(
+        #     f"Query: '{query}' \n Current Date: {formatted_date} \n -> Extracted Dates: {response.get('extracted_dates', [])}"
+        # )
+        # print(
+        #     f"Current Date: {formatted_date} \n -> Extracted Dates: {response.extracted_dates}"
+        # )
+
+        query_data = {
+            "query": query,
+            "today": formatted_date,
+            "extracted_dates": response.extracted_dates,
+        }
+
         with open(f"query_data/gemini_date_retrieval_{idx}.json", "w") as f:
-            json.dump(response, f, indent=2)
+            json.dump(query_data, f, indent=2)
