@@ -22,73 +22,13 @@ from langchain_core.prompts import (
 from langchain_core.messages import HumanMessage, AIMessage
 
 # from retrieval import retrieve_docs
-from sbert_retrieval import retrieve_docs, build_annoy_index
-from date_extraction import extract_dates
+# from sbert_retrieval import retrieve_docs, build_annoy_index
+from retrieval import retrieve_docs, build_annoy_index
+from date_extraction import extract_dates, date_parser
+from intent_classifier import classify_intent, intent_parser
 
 load_dotenv()
 
-
-INTENT_PROMPT = """
-    ### Prompt for Instruct Model
-
-    **Task**: Classify the user input into the correct intent based on the provided descriptions and examples. Output only the intent label.
-
-    **INTENTS**:
-    - `ask_date`: The user is asking for the current date.
-      - Examples: "What is today's date?", "What day is it today?"
-    - `calendar_qa`: The user inquires about events on their calendar.
-      - Examples: "What do I have going on today?", "When is {{EVENT}}?", "What days do I have {{EVENT}}?", "What time is {{EVENT}}", "When is my next class?", "Where is my Conversational AI class?", "What is my schedule like on {{DATE}}?", "What is happening today?", "What is going on this weekend?", "What is going on next week?"
-
-    **Input**: "{question}"
-
-    **Expected Output**:
-    - If the user input is about asking for the date, output `ask_date`.
-    - If the user input is about querying calendar events, output `calendar_qa`.
-
-    ### Example
-
-    **Input**: "Can you tell me what today is?"
-    **Output**: `ask_date`
-    """
-# INTENT_PROMPT = prompt = """
-# ### TASK DESCRIPTION
-
-# **Task**: Classify the user input into the correct intent based on the provided descriptions and examples. Output only the intent label.
-
-# **INTENTS**:
-# - `ask_date`: The user is asking for the current date.
-# - `calendar_qa`: The user inquires about events on their calendar.
-
-# **Expected Output**:
-# - If the user input is about asking for the date, output `ask_date`.
-# - If the user input is about querying calendar events, output `calendar_qa`.
-
-# ### Example
-
-# - **Input**: "What is today's date?"
-#   **Output**: `ask_date`
-# - **Input**: "What day is it today?"
-#   **Output**: `ask_date`
-# - **Input**: "Can you tell me what today is?"
-#   **Output**: `ask_date`
-# - **Input**: "What do I have going on today?"
-#   **Output**: `calendar_qa`
-# - **Input**: "When is my next class?"
-#   **Output**: `calendar_qa`
-# - **Input**: "Where is my Conversational AI class?"
-#   **Output**: `calendar_qa`
-# - **Input**: "What is my schedule like on June 25th?"
-#   **Output**: `calendar_qa`
-# - **Input**: "What is happening today?"
-#   **Output**: `calendar_qa`
-# - **Input**: "What is going on this weekend?"
-#   **Output**: `calendar_qa`
-# - **Input**: "What is going on next week?"
-#   **Output**: `calendar_qa`
-  
-# **Input**: "{question}"
-# **Output**:
-# """
 
 CALENDAR_QA_PROMPT = """\
     ### Calendar Question Answering Task
@@ -118,24 +58,6 @@ CALENDAR_QA_PROMPT = """\
     """
 
 
-def extract_most_frequent_intent(response):
-    # Define the patterns to search for explicit intent labels
-    patterns = ["ask_date", "calendar_qa"]
-
-    # Find all occurrences of the patterns in the response
-    matches = re.findall(
-        r"\b(?:" + "|".join(patterns) + r")\b", response, re.IGNORECASE
-    )
-
-    # Count occurrences and determine the most frequent intent
-    if matches:
-        most_common = Counter(matches).most_common(1)[0][0]
-    else:
-        most_common = "No intent found"
-
-    return most_common
-
-
 async def get_response(chain, input, verbose=True):
     response = ""
     # Print the prefix once before the chunks start arriving
@@ -163,25 +85,7 @@ async def main(calendar, annoy_index, small_llm, gemini_llm, top_n, verbose=Fals
         today = date.today()
         formatted_date = today.strftime("%B %d, %Y")
 
-        intent_prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", INTENT_PROMPT),
-                MessagesPlaceholder(variable_name="chat_history"),
-                ("human", "{question}"),
-            ]
-        )
-
-        intent_chain = intent_prompt | small_llm | StrOutputParser()
-        intent_response = await get_response(
-            intent_chain,
-            input={
-                "chat_history": chat_history,
-                "question": question,
-            },
-            verbose=False,
-        )
-
-        intent = extract_most_frequent_intent(intent_response)
+        intent = classify_intent(query=question, llm=gemini_llm, parser=intent_parser)
 
         if verbose:
             print(f"INTENT: {intent}")
@@ -189,13 +93,22 @@ async def main(calendar, annoy_index, small_llm, gemini_llm, top_n, verbose=Fals
         if intent == "ask_date":
             response = f"Today's date is {formatted_date}."
             print(f"Response: {response}")
+        elif intent == "out_of_scope":
+            response = f"I can only answer questions about today's date or your personal calendar."
+            print(f"Response: {response}")
         # elif intent == "calendar_qa":
         else:
 
-            extracted_dates = extract_dates(query=question, llm=gemini_llm, formatted_date=formatted_date)
+            extracted_dates = extract_dates(
+                query=question, llm=gemini_llm, formatted_date=formatted_date
+            )
 
             retriever_response = retrieve_docs(
-                query=question, docs=calendar, index=annoy_index, top_n=top_n
+                query=question,
+                extracted_dates=extracted_dates,
+                docs=calendar,
+                index=annoy_index,
+                top_n=top_n,
             )
 
             relevant_docs = retriever_response.get("relevant_docs", {})
@@ -231,7 +144,6 @@ async def main(calendar, annoy_index, small_llm, gemini_llm, top_n, verbose=Fals
         chat_history.extend(
             [HumanMessage(content=question), AIMessage(content=response)]
         )
-        # print(f"Response: {response}")
 
 
 if __name__ == "__main__":
@@ -286,7 +198,6 @@ if __name__ == "__main__":
         small_llm = ChatOllama(model="mistral:instruct")
         gemini_llm = small_llm
         print("Using Ollama model mistral:instruct.")
-
 
     nest_asyncio.apply()
     asyncio.run(

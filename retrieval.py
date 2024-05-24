@@ -94,8 +94,6 @@ def retrieve_docs(query, extracted_dates, docs, index, top_n=3):
 
     date_retrieved_doc_ids = {doc["id"] for doc in date_retrieved_docs}
 
-    print(len(date_retrieved_doc_ids))
-
     # Filter SBERT scored docs excluding the date-retrieved ones to avoid duplication
     additional_docs_needed = max(0, top_n - len(date_retrieved_docs))
 
