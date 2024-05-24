@@ -46,6 +46,7 @@ INTENT_PROMPT = """
 
     ### Example
 
+    
     **Input**: "Can you tell me what today is?"
     **Output**: `ask_date`
     """
@@ -84,6 +85,7 @@ INTENT_PROMPT = """
 #   **Output**: `calendar_qa`
 # - **Input**: "What is going on next week?"
 #   **Output**: `calendar_qa`
+
   
 # **Input**: "{question}"
 # **Output**:
