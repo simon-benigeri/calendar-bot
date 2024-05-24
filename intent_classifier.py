@@ -15,26 +15,7 @@ from typing import Literal
 
 load_dotenv()
 
-# INTENT_CLASSIFICATION_PROMPT = """
-# ### TASK DESCRIPTION
 
-# **Task**: Classify the user input into the correct intent based on the provided descriptions and examples. Output only the intent label.
-
-# **INTENTS**:
-# - `ask_date`: The user is asking for the current date.
-# - `calendar_qa`: The user inquires about events on their calendar.
-# - `out_of_scope`: The query does not pertain to asking for the date or inquiring about calendar events.
-
-# **Expected Output**:
-# - If the user input is about asking for the date, output `ask_date`.
-# - If the user input is about querying calendar events, output `calendar_qa`.
-# - If the user input does not fit the categories above, output `out_of_scope`.
-
-# {format_instructions}
-
-# **Input**: "{query}"
-# **Output**:
-# """
 INTENT_CLASSIFICATION_PROMPT = """
 ### TASK DESCRIPTION
 
