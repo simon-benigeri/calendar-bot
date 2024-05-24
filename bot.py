@@ -3,12 +3,9 @@ import nest_asyncio
 import json
 import os
 import argparse
-from datetime import date, datetime
-import re
-from collections import Counter
-import dateparser
+from datetime import date
+from typing import List, Dict
 
-from dotenv import load_dotenv
 
 import langchain
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -18,14 +15,17 @@ from langchain_core.prompts import (
     ChatPromptTemplate,
     MessagesPlaceholder,
 )
+from langchain_core.runnables.base import RunnableSequence
 
 from langchain_core.messages import HumanMessage, AIMessage
+from annoy import AnnoyIndex
 
 # from retrieval import retrieve_docs
 # from sbert_retrieval import retrieve_docs, build_annoy_index
 from retrieval import retrieve_docs, build_annoy_index
 from date_extraction import extract_dates, date_parser
 from intent_classifier import classify_intent, intent_parser
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -58,7 +58,7 @@ CALENDAR_QA_PROMPT = """\
     """
 
 
-async def get_response(chain, input, verbose=True):
+async def get_response(chain: RunnableSequence, input: Dict, verbose: bool =True) -> str:
     response = ""
     # Print the prefix once before the chunks start arriving
     if verbose:
@@ -73,7 +73,13 @@ async def get_response(chain, input, verbose=True):
     return response
 
 
-async def main(calendar, annoy_index, small_llm, gemini_llm, top_n, verbose=False):
+async def main(
+    calendar: List[Dict],
+    annoy_index: AnnoyIndex,
+    llm: ChatGoogleGenerativeAI | ChatOllama,
+    top_n: int = 3,
+    verbose=False,
+):
     chat_history = []
 
     while True:
@@ -85,7 +91,7 @@ async def main(calendar, annoy_index, small_llm, gemini_llm, top_n, verbose=Fals
         today = date.today()
         formatted_date = today.strftime("%B %d, %Y")
 
-        intent = classify_intent(query=question, llm=gemini_llm, parser=intent_parser)
+        intent = classify_intent(query=question, llm=llm, parser=intent_parser)
 
         if verbose:
             print(f"INTENT: {intent}")
@@ -100,7 +106,7 @@ async def main(calendar, annoy_index, small_llm, gemini_llm, top_n, verbose=Fals
         else:
 
             extracted_dates = extract_dates(
-                query=question, llm=gemini_llm, formatted_date=formatted_date
+                query=question, llm=llm, formatted_date=formatted_date
             )
 
             retriever_response = retrieve_docs(
@@ -120,16 +126,17 @@ async def main(calendar, annoy_index, small_llm, gemini_llm, top_n, verbose=Fals
                 )
                 print(f"DOCUMENTS RETRIEVED: {json.dumps(relevant_docs, indent=2)}")
 
-            PROMPT_TEMPLATE = CALENDAR_QA_PROMPT
-
             prompt = ChatPromptTemplate.from_messages(
                 [
-                    ("human", PROMPT_TEMPLATE),
+                    ("human", CALENDAR_QA_PROMPT),
                     MessagesPlaceholder(variable_name="chat_history"),
                     ("human", "{question}"),
                 ]
             )
-            chain = prompt | gemini_llm | StrOutputParser()
+            chain = prompt | llm | StrOutputParser()
+
+            print(type(chain))
+            print(ass)
 
             response = await get_response(
                 chain,
@@ -154,7 +161,7 @@ if __name__ == "__main__":
         "-g",
         "--gemini",
         action="store_true",
-        help="Use Gemini API, if not, use Ollama model phi-3.",
+        help="Use Gemini API, if not, use Ollama model mistral:instruct.",
     )
 
     parser.add_argument(
@@ -187,19 +194,21 @@ if __name__ == "__main__":
     annoy_index = build_annoy_index(calendar, args.fields)
 
     if args.gemini:
-        gemini_llm = ChatGoogleGenerativeAI(
+        llm = ChatGoogleGenerativeAI(
             api_key=os.getenv("GOOGLE_API_KEY"), model="gemini-1.5-pro-latest"
         )
-        small_llm = ChatOllama(model="mistral:instruct")
-        print("Using Gemini API and Ollama model mistral:instruct.")
+        print("Using Gemini API.")
     else:
-        # llm = ChatOllama(model="phi3")
-        # print("Using Ollama model phi-3.")
-        small_llm = ChatOllama(model="mistral:instruct")
-        gemini_llm = small_llm
+        llm = ChatOllama(model="mistral:instruct")
         print("Using Ollama model mistral:instruct.")
 
     nest_asyncio.apply()
     asyncio.run(
-        main(calendar, annoy_index, small_llm, gemini_llm, args.top_n, args.verbose)
+        main(
+            calendar=calendar,
+            annoy_index=annoy_index,
+            llm=llm,
+            top_n=args.top_n,
+            verbose=args.verbose,
+        )
     )

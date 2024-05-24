@@ -101,31 +101,37 @@ class Intent(BaseModel):
 intent_parser = PydanticOutputParser(pydantic_object=Intent)
 
 
-def classify_intent(query, llm, parser=intent_parser, verbose=False):
-
-    # prompt = PromptTemplate(
-    #     template=INTENT_CLASSIFICATION_PROMPT,
-    #     input_variables=["query"],
-    #     partial_variables={"format_instructions": parser.get_format_instructions()},
-    # )
+def classify_intent(
+    query: str,
+    llm: ChatGoogleGenerativeAI,
+    parser: PydanticOutputParser | JsonOutputParser = intent_parser,
+    verbose: bool = False,
+):
 
     prompt = PromptTemplate(
         template=INTENT_CLASSIFICATION_PROMPT,
         input_variables=["query"],
-    ).partial(
-        format_instructions=parser.get_format_instructions(),
-        pattern=re.compile(r"\`\`\`\n\`\`\`"),
+        partial_variables={"format_instructions": parser.get_format_instructions()},
     )
+
+    # prompt = PromptTemplate(
+    #     template=INTENT_CLASSIFICATION_PROMPT,
+    #     input_variables=["query"],
+    # ).partial(
+    #     format_instructions=parser.get_format_instructions(),
+    #     pattern=re.compile(r"\`\`\`\n\`\`\`"),
+    # )
 
     chain = prompt | llm | parser
 
     response = chain.invoke({"query": query})
 
-    response["query"] = query
-
     if verbose:
+        # print(
+        #     f"Query: '{query}' \n -> Classified Intent: {response.get('intent', 'No intent detected')}"
+        # )
         print(
-            f"Query: '{query}' \n -> Classified Intent: {response.get('intent', 'No intent detected')}"
+            f"Query: '{query}' \n -> Classified Intent: {response.intent}"
         )
 
     return response
@@ -136,7 +142,8 @@ if __name__ == "__main__":
     gemini_llm = ChatGoogleGenerativeAI(
         api_key=os.getenv("GOOGLE_API_KEY"), model="gemini-1.5-pro-latest"
     )
-    intent_parser = JsonOutputParser(pydantic_object=Intent)
+    # intent_parser = JsonOutputParser(pydantic_object=Intent)
+    intent_parser = PydanticOutputParser(pydantic_object=Intent)
 
     test_queries = [
         ("What's today's date?", "ask_date"),
@@ -193,8 +200,14 @@ if __name__ == "__main__":
 
     for idx, query in enumerate(test_queries):
         response = classify_intent(query[0], gemini_llm, intent_parser, verbose)
-        response["ground_truth"] = query[1]
-        response["query"] = query[0]
+        # response["ground_truth"] = query[1]
+        # response["query"] = query[0]
         # Save response to JSON file
+        query_data = {
+            "query": query[0],
+            "groundtruth" : query[1],
+            "intent" : response.intent,
+        }
         with open(f"query_data/intent_classification_{idx}.json", "w") as f:
-            json.dump(response, f, indent=2)
+            json.dump(query_data, f, indent=2)
+

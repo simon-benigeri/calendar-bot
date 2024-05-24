@@ -39,18 +39,6 @@ def get_embeddings(text):
     return embeddings.squeeze().numpy()
 
 
-# def build_annoy_index(
-#     docs, text_fields: List[str], embedding_dim: int = 384, n_trees: int = 10
-# ):
-#     index = AnnoyIndex(embedding_dim, "angular")
-#     for i, doc in enumerate(docs):
-#         doc_text = " ".join([str(doc.get(field, "")) for field in text_fields])
-#         embedding = get_embeddings(doc_text)
-#         index.add_item(doc["index_id"], embedding)
-#     index.build(n_trees)
-#     return index
-
-
 def build_annoy_index(
     docs, text_fields: List[str], embedding_dim: int = embedding_dims, n_trees: int = 10
 ):
