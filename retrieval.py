@@ -1,5 +1,7 @@
 import os
 from datetime import date, datetime
+import time
+import argparse
 import json
 from typing import List, Dict
 import torch
@@ -15,8 +17,11 @@ from date_extraction import extract_dates
 load_dotenv()
 
 # Initialize tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
-model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+# MODEL = "sentence-transformers/msmarco-bert-base-dot-v5"
+model_choice = "sentence-transformers/all-MiniLM-L6-v2"
+
+tokenizer = AutoTokenizer.from_pretrained(model_choice)
+model = AutoModel.from_pretrained(model_choice)
 
 
 def get_embeddings(text):
@@ -27,15 +32,31 @@ def get_embeddings(text):
     return embeddings.squeeze().numpy()
 
 
+# def build_annoy_index(
+#     docs, text_fields: List[str], embedding_dim: int = 384, n_trees: int = 10
+# ):
+#     index = AnnoyIndex(embedding_dim, "angular")
+#     for i, doc in enumerate(docs):
+#         doc_text = " ".join([str(doc.get(field, "")) for field in text_fields])
+#         embedding = get_embeddings(doc_text)
+#         index.add_item(doc["index_id"], embedding)
+#     index.build(n_trees)
+#     return index
+
+
 def build_annoy_index(
-    docs, text_fields: List[str], embedding_dim: int = 384, n_trees: int = 10
+    docs, text_fields: List[str], embedding_dim: int = 768, n_trees: int = 10
 ):
+    start_time = time.time()  # Start timing
     index = AnnoyIndex(embedding_dim, "angular")
     for i, doc in enumerate(docs):
         doc_text = " ".join([str(doc.get(field, "")) for field in text_fields])
         embedding = get_embeddings(doc_text)
-        index.add_item(doc["index_id"], embedding)
+        index.add_item(doc["index_id"], embedding)  # Use index i as the item ID
     index.build(n_trees)
+    print(
+        f"Annoy index built in {time.time() - start_time} seconds"
+    )  # Print time taken
     return index
 
 
@@ -86,6 +107,7 @@ def retrieve_with_sbert(query, docs, index, top_n=5, exclude_ids=set()):
 
 
 def retrieve_docs(query, extracted_dates, docs, index, top_n=3):
+    start_time = time.time()  # Start timing
     # Assign SBERT scores to all documents
     all_docs_scored = retrieve_with_sbert(query, docs, index, top_n=len(docs))
 
@@ -104,6 +126,10 @@ def retrieve_docs(query, extracted_dates, docs, index, top_n=3):
     # Combine date-retrieved docs with additional SBERT docs
     combined_docs = date_retrieved_docs + additional_sbert_docs
 
+    print(
+        f"Retrieval for '{query}' completed in {time.time() - start_time} seconds"
+    )  # Print time taken
+
     response = {
         "query": query,
         "top_n": top_n,
@@ -115,7 +141,34 @@ def retrieve_docs(query, extracted_dates, docs, index, top_n=3):
 
 if __name__ == "__main__":
 
+    # Setup the argument parser
+    # Setup the argument parser
+    parser = argparse.ArgumentParser(description="Document retrieval with embeddings")
+    parser.add_argument(
+        "-f",
+        "--fast",
+        action="store_true",
+        help="Use a faster, less accurate model for embeddings.",
+    )
+
+    args = parser.parse_args()
+
+    model_choice = (
+        "sentence-transformers/all-MiniLM-L6-v2"
+        if args.fast
+        else "sentence-transformers/msmarco-bert-base-dot-v5"
+    )
+
+    embedding_dims_dict = {
+        "sentence-transformers/all-MiniLM-L6-v2": 384,
+        "sentence-transformers/msmarco-bert-base-dot-v5": 768,
+    }
+
+    tokenizer = AutoTokenizer.from_pretrained(model_choice)
+    model = AutoModel.from_pretrained(model_choice)
+
     calendar = json.load(open("my_calendar_data_filtered.json"))
+    print(f"{len(calendar)} events in calendar")
     for i, event in enumerate(calendar):
         event["index_id"] = i
 
@@ -123,7 +176,11 @@ if __name__ == "__main__":
     text_fields = ["location", "summary", "description"]
     top_n = 3
 
-    annoy_index = build_annoy_index(calendar, text_fields)
+    annoy_index = build_annoy_index(
+        docs=calendar,
+        text_fields=text_fields,
+        embedding_dim=embedding_dims_dict[model_choice],
+    )
 
     # # Example cases
     queries = [
@@ -142,6 +199,9 @@ if __name__ == "__main__":
         "When is the match?",
         "When is the football game?",
         "When do Arsenal play",
+        "When is am I having lunch?",
+        "What restaurant am I dining at?",
+        "Where am I eating?",
     ]
 
     today = date.today()
@@ -154,9 +214,13 @@ if __name__ == "__main__":
     verbose = True
 
     for idx, query in enumerate(queries):
+        start_time = time.time()  # Start timing
         extracted_dates = extract_dates(
             query=query, llm=gemini_llm, formatted_date=formatted_date, verbose=verbose
         )
+        print(
+            f"Gemini date extraction for '{query}' completed in {time.time() - start_time} seconds"
+        )  # Print time taken
         response = retrieve_docs(
             query,
             docs=calendar,
@@ -170,5 +234,10 @@ if __name__ == "__main__":
         # print(
         #     f"Query: '{query}' -> Extracted Dates: {response.get('extracted_dates', [])}"
         # )
-        with open(f"query_data/sbert_query_{idx}_top_n_{top_n}.json", "w") as f:
+        p = (
+            f"query_data/sbert_query_{idx}_top_n_{top_n}_fast.json"
+            if args.fast
+            else f"query_data/sbert_query_{idx}_top_n_{top_n}.json"
+        )
+        with open(p, "w") as f:
             json.dump(response, f, indent=2)
