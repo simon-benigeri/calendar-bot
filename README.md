@@ -70,7 +70,17 @@ To download the calendar data, filtered, with up to 50 events, including the pas
 `python calendar_utils.py -f -p -n 50`
 
 ### 6. Start chatting
-1. Start Ollama on your local machine
+<!-- 1. Start Ollama on your local machine
 2. To start chatting with gemini:  
-`python retrieval_bot.py -g` or `python retrieval_bot.py -g -v` if you want the intent classifier output.
+`python retrieval_bot.py -g` or `python retrieval_bot.py -g -v` if you want the intent classifier output. -->
+1. To start chatting with gemini:  
+`python bot.py -g` or `python bot.py -g -v` if you want the intent classifier output.
+```
+-g use gemini
+-v print outputs for intent classifier and date extractor
+-n provides max number of events to retrieve (default value is 3), e.g. -n 5
+```
+2. To start chatting with mistral:instruct on Ollama:  
+    1. Start Ollama on your local machine
+    2. `python bot.py` or `python bot.py -v` if you want the intent classifier output.
 
