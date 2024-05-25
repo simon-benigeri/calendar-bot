@@ -21,11 +21,9 @@ from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
 from langchain_core.messages import HumanMessage, AIMessage
 from annoy import AnnoyIndex
 
-# from retrieval import retrieve_docs
-# from sbert_retrieval import retrieve_docs, build_annoy_index
 from retrieval import retrieve_docs, build_annoy_index
-from date_extraction import extract_dates, date_parser
-from intent_classifier import classify_intent, intent_parser
+from date_extraction import extract_dates, date_parser, Dates
+from intent_classifier import classify_intent, intent_parser, Intent
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -63,7 +61,8 @@ async def get_intent(
     query: str,
     llm: ChatGoogleGenerativeAI,
     parser: PydanticOutputParser | JsonOutputParser = intent_parser,
-):
+) -> Intent:
+    """Async function to classify intent."""
     return classify_intent(query=query, llm=llm, parser=parser)
 
 
@@ -72,26 +71,38 @@ async def get_dates(
     llm: ChatGoogleGenerativeAI,
     formatted_date: str,
     parser: PydanticOutputParser | JsonOutputParser = date_parser,
-):
+) -> Dates:
+    """Async function to extract dates from query."""
     return extract_dates(
         query=query, llm=llm, formatted_date=formatted_date, parser=parser
     )
 
 
-async def get_response(
-    chain: RunnableSequence, input: Dict, verbose: bool = True
-) -> str:
+# async def get_response(
+#     chain: RunnableSequence, input: Dict, verbose: int = 0
+# ) -> str:
+#     """Async function collect Gemini response and stream the output (looks nicer)."""
+#     response = ""
+#     # Print the prefix once before the chunks start arriving
+#     if verbose > 0:
+#         print("Response: ", end="", flush=True)
+
+#     # Print each chunk as it arrives
+#     async for chunk in chain.astream(input):
+#         if verbose > 0:
+#             print(chunk, end="", flush=True)
+#         response += chunk
+
+#     return response
+
+
+async def get_response(chain: RunnableSequence, input: Dict) -> str:
+    """Async function collect Gemini response and prints each chunk as it arrives (looks nicer)."""
+    print("Response: ", end="", flush=True)
     response = ""
-    # Print the prefix once before the chunks start arriving
-    if verbose:
-        print("Response: ", end="", flush=True)
-
-    # Print each chunk as it arrives
     async for chunk in chain.astream(input):
-        if verbose:
-            print(chunk, end="", flush=True)
+        print(chunk, end="", flush=True)
         response += chunk
-
     return response
 
 
@@ -100,9 +111,14 @@ async def main(
     annoy_index: AnnoyIndex,
     llm: ChatGoogleGenerativeAI | ChatOllama,
     top_n: int = 3,
-    verbose=False,
+    verbose: int = 1,
     use_async=False,
 ):
+    """Main function to run the chatbot.
+    1. read user input query
+    2. classify intent
+    3. if intent is calendar_qa, extract dates, retrieve documents, and chat w/ Gemini.
+    """
     chat_history = []
 
     while True:
@@ -120,9 +136,10 @@ async def main(
         else:
             intent = classify_intent(query=question, llm=llm, parser=intent_parser)
 
-        print(f"Intent retrieval time: {time.time() - start_time:.2f} seconds")
+        if verbose > 1:
+            print(f"Intent retrieval time: {time.time() - start_time:.2f} seconds")
 
-        if verbose:
+        if verbose > 0:
             print(f"INTENT: {intent.intent}")
 
         if intent.intent == "ask_date":
@@ -149,8 +166,8 @@ async def main(
                     formatted_date=formatted_date,
                     parser=date_parser,
                 )
-
-            print(f"Date extraction time: {time.time() - start_time:.2f} seconds")
+            if verbose > 1:
+                print(f"Date extraction time: {time.time() - start_time:.2f} seconds")
 
             start_time = time.time()  # Start timing
             # TODO: check if this didnt break with pydantic
@@ -161,13 +178,18 @@ async def main(
                 index=annoy_index,
                 top_n=top_n,
             )
-            print(f"Document retrieval time: {time.time() - start_time:.2f} seconds")
+            if verbose > 1:
+                print(
+                    f"Document retrieval time: {time.time() - start_time:.2f} seconds"
+                )
 
             relevant_docs = retriever_response.get("relevant_docs", {})
 
-            if verbose:
+            if verbose > 0:
                 print(f"N DOCUMENTS RETRIEVED: {len(relevant_docs)}")
                 print(f"EXTRACTED DATES: {dates.extracted_dates}")
+            
+            if verbose > 2:
                 print(f"DOCUMENTS RETRIEVED: {json.dumps(relevant_docs, indent=2)}")
 
             prompt = ChatPromptTemplate.from_messages(
@@ -189,7 +211,10 @@ async def main(
                     "question": question,
                 },
             )
-            print(f"Response generation time: {time.time() - start_time:.2f} seconds")
+            if verbose > 1:
+                print(
+                    f"Response generation time: {time.time() - start_time:.2f} seconds"
+                )
 
         chat_history.extend(
             [HumanMessage(content=question), AIMessage(content=response)]
@@ -231,8 +256,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "-v",
         "--verbose",
-        action="store_true",
-        help="Print detected intent, n docs retrieved, and dates extracted",
+        choices=[0, 1, 2, 3],
+        default=0,
+        type=int,
+        help=(
+            "Control the verbosity of the output: "
+            "0 -> Print only the response; "
+            "1 -> Print detected intent, number of documents retrieved, and dates extracted; "
+            "2 -> Additionally, print processing time; "
+            "3 -> Additionally, print details of the retrieved documents."
+        ),
     )
 
     args = parser.parse_args()
@@ -243,7 +276,9 @@ if __name__ == "__main__":
     print("Building index of calendar documents.")
     start_time = time.time()  # Start timing
     annoy_index = build_annoy_index(calendar, args.fields)
-    print(f"Annoy index building time: {time.time() - start_time:.2f} seconds")
+
+    if args.verbose > 1:
+        print(f"Annoy index building time: {time.time() - start_time:.2f} seconds")
 
     if args.gemini:
         llm = ChatGoogleGenerativeAI(
