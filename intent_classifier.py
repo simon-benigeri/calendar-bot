@@ -63,6 +63,12 @@ INTENT_CLASSIFICATION_PROMPT = """
   **Output**: {{'intent': 'out_of_scope'}}
 - **Input**: "Tell me a joke."
   **Output**: {{'intent': 'out_of_scope'}}
+- **Input**: "What about tomorrow?"
+  **Output**: {{'intent': 'calendar_qa'}}
+- **Input**: "What about next week?"
+  **Output**: {{'intent': 'calendar_qa'}}
+- **Input**: "And yesterday?"
+  **Output**: {{'intent': 'calendar_qa'}}
 
 {format_instructions}
 
