@@ -5,6 +5,7 @@ import os
 import argparse
 from datetime import date
 from typing import List, Dict
+import time
 
 
 import langchain
@@ -16,7 +17,7 @@ from langchain_core.prompts import (
     MessagesPlaceholder,
 )
 from langchain_core.runnables.base import RunnableSequence
-
+from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
 from langchain_core.messages import HumanMessage, AIMessage
 from annoy import AnnoyIndex
 
@@ -58,7 +59,28 @@ CALENDAR_QA_PROMPT = """\
     """
 
 
-async def get_response(chain: RunnableSequence, input: Dict, verbose: bool =True) -> str:
+async def get_intent(
+    query: str,
+    llm: ChatGoogleGenerativeAI,
+    parser: PydanticOutputParser | JsonOutputParser = intent_parser,
+):
+    return classify_intent(query=query, llm=llm, parser=parser)
+
+
+async def get_dates(
+    query: str,
+    llm: ChatGoogleGenerativeAI,
+    formatted_date: str,
+    parser: PydanticOutputParser | JsonOutputParser = date_parser,
+):
+    return extract_dates(
+        query=query, llm=llm, formatted_date=formatted_date, parser=parser
+    )
+
+
+async def get_response(
+    chain: RunnableSequence, input: Dict, verbose: bool = True
+) -> str:
     response = ""
     # Print the prefix once before the chunks start arriving
     if verbose:
@@ -79,6 +101,7 @@ async def main(
     llm: ChatGoogleGenerativeAI | ChatOllama,
     top_n: int = 3,
     verbose=False,
+    use_async=False,
 ):
     chat_history = []
 
@@ -91,39 +114,60 @@ async def main(
         today = date.today()
         formatted_date = today.strftime("%B %d, %Y")
 
-        intent = classify_intent(query=question, llm=llm, parser=intent_parser)
+        start_time = time.time()  # Start timing
+        if use_async:
+            intent = await get_intent(query=question, llm=llm, parser=intent_parser)
+        else:
+            intent = classify_intent(query=question, llm=llm, parser=intent_parser)
+
+        print(f"Intent retrieval time: {time.time() - start_time:.2f} seconds")
 
         if verbose:
-            print(f"INTENT: {intent}")
+            print(f"INTENT: {intent.intent}")
 
-        if intent == "ask_date":
+        if intent.intent == "ask_date":
             response = f"Today's date is {formatted_date}."
             print(f"Response: {response}")
-        elif intent == "out_of_scope":
+        elif intent.intent == "out_of_scope":
             response = f"I can only answer questions about today's date or your personal calendar."
             print(f"Response: {response}")
         # elif intent == "calendar_qa":
         else:
+            start_time = time.time()  # Start timing
 
-            extracted_dates = extract_dates(
-                query=question, llm=llm, formatted_date=formatted_date, parser=date_parser
-            )
+            if use_async:
+                dates = await get_dates(
+                    query=question,
+                    llm=llm,
+                    formatted_date=formatted_date,
+                    parser=date_parser,
+                )
+            else:
+                dates = extract_dates(
+                    query=question,
+                    llm=llm,
+                    formatted_date=formatted_date,
+                    parser=date_parser,
+                )
+
+            print(f"Date extraction time: {time.time() - start_time:.2f} seconds")
+
+            start_time = time.time()  # Start timing
             # TODO: check if this didnt break with pydantic
             retriever_response = retrieve_docs(
                 query=question,
-                extracted_dates=extracted_dates,
+                extracted_dates=dates.extracted_dates,
                 docs=calendar,
                 index=annoy_index,
                 top_n=top_n,
             )
+            print(f"Document retrieval time: {time.time() - start_time:.2f} seconds")
 
             relevant_docs = retriever_response.get("relevant_docs", {})
 
             if verbose:
                 print(f"N DOCUMENTS RETRIEVED: {len(relevant_docs)}")
-                print(
-                    f"EXTRACTED DATES: {extracted_dates.extracted_dates}"
-                )
+                print(f"EXTRACTED DATES: {dates.extracted_dates}")
                 print(f"DOCUMENTS RETRIEVED: {json.dumps(relevant_docs, indent=2)}")
 
             prompt = ChatPromptTemplate.from_messages(
@@ -135,6 +179,7 @@ async def main(
             )
             chain = prompt | llm | StrOutputParser()
 
+            start_time = time.time()  # Start timing
             response = await get_response(
                 chain,
                 input={
@@ -144,6 +189,7 @@ async def main(
                     "question": question,
                 },
             )
+            print(f"Response generation time: {time.time() - start_time:.2f} seconds")
 
         chat_history.extend(
             [HumanMessage(content=question), AIMessage(content=response)]
@@ -159,6 +205,13 @@ if __name__ == "__main__":
         "--gemini",
         action="store_true",
         help="Use Gemini API, if not, use Ollama model mistral:instruct.",
+    )
+
+    parser.add_argument(
+        "-a",
+        "--use_async",
+        action="store_true",
+        help="Use async for intent classification and date extraction.",
     )
 
     parser.add_argument(
@@ -188,7 +241,9 @@ if __name__ == "__main__":
         event["index_id"] = i
 
     print("Building index of calendar documents.")
+    start_time = time.time()  # Start timing
     annoy_index = build_annoy_index(calendar, args.fields)
+    print(f"Annoy index building time: {time.time() - start_time:.2f} seconds")
 
     if args.gemini:
         llm = ChatGoogleGenerativeAI(
@@ -207,5 +262,6 @@ if __name__ == "__main__":
             llm=llm,
             top_n=args.top_n,
             verbose=args.verbose,
+            use_async=args.use_async,
         )
     )
