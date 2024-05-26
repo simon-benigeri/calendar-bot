@@ -155,6 +155,12 @@ def get_calendar_events(past: bool=False, n_events:int = 50):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download calendar data.")
     parser.add_argument(
+        "--calendar_path",
+        default="sample_calendar.json",
+        type=str,
+        help="Specifies the path to the calendar JSON file. Default is 'sample_calendar.json'.",
+    )
+    parser.add_argument(
         "-p",
         "--past",
         action="store_true",
@@ -174,10 +180,9 @@ if __name__ == "__main__":
     # Save events to a JSON file
     events = get_calendar_events(past=args.past, n_events=args.n_events)
     print(f"Retrieving {len(events)} events.")
-    path = "my_calendar_data.json"
     keys_to_keep = ["id", "date", "start", "location", "summary", "description"]
     if args.filter:
         events = filter_event_keys(events, keys_to_keep)
-        path = "my_calendar_data_filtered.json"
+    path = args.calendar_path
     with open(path, "w") as f:
         json.dump(events, f, indent=2)
