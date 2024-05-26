@@ -1,11 +1,11 @@
 # calendar-bot
 A chatbot that you can answer any questions about your personal calendar.
-The bot uses Google Calendar data downloaded from a separate script, `calendar_utils.py`. Once your calendar is downloaded, you can use run the `bot.py` script to for calendar Q & A.
+The bot uses Google Calendar data downloaded from a separate script, `download_calendar.py`. Once your calendar is downloaded, you can use run the `bot.py` script to for calendar Q & A.
 
 ## Setting up 
 
 ### 1. Python requirements
-This chatbot was developed in a `python > 3.10` environment. The requirements are in `requirements_demo.txt`.
+This chatbot was developed in a `python > 3.10` environment. The requirements for the demo are in `requirements_demo.txt`.
 
 ```bash
 conda create -n calendar-bot python=3.10 
@@ -49,7 +49,7 @@ The file `sample_calendar.json` contains a calendar that you can use to test the
  
 ### 1. Download the calendar data
 To download the your calendar data, run he calendar download script with the following command:  
-```python calendar_utils.py [options]```
+```python download_calendar.py [options]```
 
 #### Options
 - **--calendar_path**: Specifies the path at which to save the calendar JSON file. Default is 'sample_calendar.json'.
@@ -58,7 +58,7 @@ To download the your calendar data, run he calendar download script with the fol
 - **-p, --past**: Retrieve past events (include last 2 weeks) (**recommended**).
 
 Here is an example with recommended arguments:  
-```python calendar_utils.py --calendar_path "my_calendar.json" --filter --past --n_events 50```
+```python download_calendar.py --calendar_path "my_calendar.json" --filter --past --n_events 50```
 
 If you did not set up Google Calendar API access to use your personal calendar, skip this step and use the sample data in the `sample_calendar.json` provided.
 
@@ -78,4 +78,4 @@ Run the script with the following command:
   - `3`: Additionally, print details of the retrieved documents.
 
 Here is an example:  
-```python calendar_qa_chatbot.py -p "sample_calendar.json" --use_async --top_n 5 --fields "location,summary,description" --verbose 1```
+```python bot.py --calendar_path "sample_calendar.json" --use_async --top_n 5 --fields "location,summary,description" --verbose 1```
