@@ -76,4 +76,4 @@ Run the script with the following command:
   - `3`: Additionally, print details of the retrieved documents.
 
 Here is an example:  
-```python calendar_qa_chatbot.py -p "sample_calendar.json" --use_async --top_n 5 --fields "location,summary,description" --verbose 2```
+```python calendar_qa_chatbot.py -p "sample_calendar.json" --use_async --top_n 5 --fields "location,summary,description" --verbose 1```
