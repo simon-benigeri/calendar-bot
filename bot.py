@@ -188,7 +188,7 @@ async def main(
             if verbose > 0:
                 print(f"N DOCUMENTS RETRIEVED: {len(relevant_docs)}")
                 print(f"EXTRACTED DATES: {dates.extracted_dates}")
-            
+
             if verbose > 2:
                 print(f"DOCUMENTS RETRIEVED: {json.dumps(relevant_docs, indent=2)}")
 
@@ -226,10 +226,11 @@ if __name__ == "__main__":
         description="Interact with a chat model to process calendar and date inquiries."
     )
     parser.add_argument(
-        "-g",
-        "--gemini",
-        action="store_true",
-        help="Use Gemini API, if not, use Ollama model mistral:instruct.",
+        "-p",
+        "--calendar_path",
+        default="sample_calendar.json",
+        type=str,
+        help="Specifies the path to the calendar JSON file. Default is 'sample_calendar.json'.",
     )
 
     parser.add_argument(
@@ -269,7 +270,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    calendar = json.load(open("my_calendar_data_filtered.json"))
+    calendar = json.load(open(args.calendar_path))
     for i, event in enumerate(calendar):
         event["index_id"] = i
 
@@ -280,14 +281,10 @@ if __name__ == "__main__":
     if args.verbose > 1:
         print(f"Annoy index building time: {time.time() - start_time:.2f} seconds")
 
-    if args.gemini:
-        llm = ChatGoogleGenerativeAI(
+    llm = ChatGoogleGenerativeAI(
             api_key=os.getenv("GOOGLE_API_KEY"), model="gemini-1.5-pro-latest"
-        )
-        print("Using Gemini API.")
-    else:
-        llm = ChatOllama(model="mistral:instruct")
-        print("Using Ollama model mistral:instruct.")
+    )
+    print("Using Gemini API.")
 
     nest_asyncio.apply()
     asyncio.run(
