@@ -77,31 +77,19 @@ async def get_dates(
     )
 
 
-# async def get_response(
-#     chain: RunnableSequence, input: Dict, verbose: int = 0
-# ) -> str:
-#     """Async function collect Gemini response and stream the output (looks nicer)."""
-#     response = ""
-#     # Print the prefix once before the chunks start arriving
-#     if verbose > 0:
-#         print("Response: ", end="", flush=True)
-
-#     # Print each chunk as it arrives
-#     async for chunk in chain.astream(input):
-#         if verbose > 0:
-#             print(chunk, end="", flush=True)
-#         response += chunk
-
-#     return response
-
-
-async def get_response(chain: RunnableSequence, input: Dict) -> str:
-    """Async function collect Gemini response and prints each chunk as it arrives (looks nicer)."""
-    print("Response: ", end="", flush=True)
-    response = ""
-    async for chunk in chain.astream(input):
-        print(chunk, end="", flush=True)
-        response += chunk
+async def get_response(
+    chain: RunnableSequence, input: Dict, stream_response: bool = False
+) -> str:
+    """Async function collect Gemini response and prints each chunk as it arrives if stream_response (looks nicer)."""
+    if stream_response:
+        response = ""
+        print("Response: ", end="", flush=True)
+        async for chunk in chain.astream(input):
+            print(chunk, end="", flush=True)
+            response += chunk
+    else:
+        response = chain.invoke(input=input)
+        print("Response: {response}")
     return response
 
 
@@ -112,6 +100,7 @@ async def main(
     top_n: int = 3,
     verbose: int = 1,
     use_async=False,
+    stream_response=False,
 ):
     """Main function to run the chatbot.
     1. read user input query
@@ -209,6 +198,7 @@ async def main(
                     "chat_history": chat_history,
                     "question": question,
                 },
+                stream_response=stream_response,
             )
             if verbose > 1:
                 print(
@@ -237,6 +227,12 @@ if __name__ == "__main__":
         "--use_async",
         action="store_true",
         help="Use async for intent classification and date extraction.",
+    )
+    parser.add_argument(
+        "-s",
+        "--stream",
+        action="store_true",
+        help="Stream the calendar_qa response, chunk by chunk (looks nicer but can break).",
     )
 
     parser.add_argument(
@@ -281,7 +277,7 @@ if __name__ == "__main__":
         print(f"Annoy index building time: {time.time() - start_time:.2f} seconds")
 
     llm = ChatGoogleGenerativeAI(
-            api_key=os.getenv("GOOGLE_API_KEY"), model="gemini-1.5-pro-latest"
+        api_key=os.getenv("GOOGLE_API_KEY"), model="gemini-1.5-pro-latest"
     )
     print("Using Gemini API.")
 
@@ -294,5 +290,6 @@ if __name__ == "__main__":
             top_n=args.top_n,
             verbose=args.verbose,
             use_async=args.use_async,
+            stream_response=args.stream,
         )
     )
