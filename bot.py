@@ -238,7 +238,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-n",
         "--top_n",
-        default=3,
+        default=5,
         help="Top n documents to retrieve.",
     )
 

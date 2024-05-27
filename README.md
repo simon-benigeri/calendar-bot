@@ -70,7 +70,7 @@ Run the script with the following command:
 - **-p, --calendar_path**: Specifies the path from which to load the calendar JSON file. Default is 'sample_calendar.json'.
 - **-a, --use_async**: Enable asynchronous operation for intent classification and date extraction.
 - **-s, --stream**: Streams the calendar_qa response chunk by chunk (it looks nice but it may not work in your environment).
-- **-n, --top_n**: Specify the number of top documents to retrieve from the calendar (default is 3).
+- **-n, --top_n**: Specify the number of top documents to retrieve from the calendar (default is 5).
 - **-f, --fields**: Specify the fields from the calendar to be indexed (default are "location", "summary", "description").
 - **-v, --verbose**: Control the verbosity of the output:
   - `0`: Print only the response.
