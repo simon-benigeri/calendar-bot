@@ -82,6 +82,15 @@ class Intent(BaseModel):
         description="Classifies the user's query into 'ask_date' for queries asking about the current date, 'calendar_qa' for queries inquiring about calendar events, or 'out_of_scope' for queries that do not fit the other categories."
     )
 
+# class Intent(BaseModel):
+#     intent: Literal["ask_date", "calendar_qa", "out_of_scope"] = Field(
+#         description=(
+#             "Classifies the user's query into specific categories: "
+#             "'ask_date' for queries asking about the current date, "
+#             "'calendar_qa' for queries inquiring about calendar events, "
+#             "or 'out_of_scope' for queries that do not fit the other categories."
+#         )
+#     )
 
 # parser = StringOutputParser()
 # parser = JsonOutputParser(pydantic_object=Intent)
