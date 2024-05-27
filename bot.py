@@ -10,7 +10,6 @@ import time
 
 import langchain
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.chat_models import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import (
     ChatPromptTemplate,
@@ -109,7 +108,7 @@ async def get_response(chain: RunnableSequence, input: Dict) -> str:
 async def main(
     calendar: List[Dict],
     annoy_index: AnnoyIndex,
-    llm: ChatGoogleGenerativeAI | ChatOllama,
+    llm: ChatGoogleGenerativeAI,
     top_n: int = 3,
     verbose: int = 1,
     use_async=False,
