@@ -5,7 +5,7 @@ The bot uses Google Calendar data downloaded from a separate script, `download_c
 ## Setting up 
 
 ### 1. Python requirements
-This chatbot was developed in a `python > 3.10` environment. The requirements for the demo are in `requirements_demo.txt`.
+This chatbot was developed in a `python=3.10` environment. The requirements for the demo are in `requirements_demo.txt`.
 
 ```bash
 conda create -n calendar-bot python=3.10 
