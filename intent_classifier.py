@@ -98,6 +98,7 @@ class Intent(BaseModel):
         description="Classifies the user's query into 'ask_date' for queries asking about the current date, 'calendar_qa' for queries inquiring about calendar events, or 'out_of_scope' for queries that do not fit the other categories."
     )
 
+
 # class Intent(BaseModel):
 #     intent: Literal["ask_date", "calendar_qa", "out_of_scope"] = Field(
 #         description=(
@@ -122,35 +123,33 @@ def classify_intent(
 
     # first try this
     try:
-      prompt = PromptTemplate(
-          template=INTENT_CLASSIFICATION_PROMPT,
-          input_variables=["query"],
-          partial_variables={"format_instructions": parser.get_format_instructions()},
-      )
-      chain = prompt | llm | parser
+        prompt = PromptTemplate(
+            template=INTENT_CLASSIFICATION_PROMPT,
+            input_variables=["query"],
+            partial_variables={"format_instructions": parser.get_format_instructions()},
+        )
+        chain = prompt | llm | parser
 
-      response = chain.invoke({"query": query})
+        response = chain.invoke({"query": query})
     except:
-      # if we don't get a response, try again with this
-      prompt = PromptTemplate(
-          template=INTENT_CLASSIFICATION_PROMPT,
-          input_variables=["query"],
-      ).partial(
-          format_instructions=parser.get_format_instructions(),
-          pattern=re.compile(r"\`\`\`\n\`\`\`"),
-      )
+        # if we don't get a response, try again with this
+        prompt = PromptTemplate(
+            template=INTENT_CLASSIFICATION_PROMPT,
+            input_variables=["query"],
+        ).partial(
+            format_instructions=parser.get_format_instructions(),
+            pattern=re.compile(r"\`\`\`\n\`\`\`"),
+        )
 
-      chain = prompt | llm | parser
+        chain = prompt | llm | parser
 
-      response = chain.invoke({"query": query})
+        response = chain.invoke({"query": query})
 
     if verbose:
         # print(
         #     f"Query: '{query}' \n -> Classified Intent: {response.get('intent', 'No intent detected')}"
         # )
-        print(
-            f"Query: '{query}' \n -> Classified Intent: {response.intent}"
-        )
+        print(f"Query: '{query}' \n -> Classified Intent: {response.intent}")
 
     return response
 
@@ -223,9 +222,8 @@ if __name__ == "__main__":
         # Save response to JSON file
         query_data = {
             "query": query[0],
-            "groundtruth" : query[1],
-            "intent" : response.intent,
+            "groundtruth": query[1],
+            "intent": response.intent,
         }
         with open(f"query_data/intent_classification_{idx}.json", "w") as f:
             json.dump(query_data, f, indent=2)
-

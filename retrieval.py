@@ -24,9 +24,9 @@ tokenizer = AutoTokenizer.from_pretrained(model_choice)
 model = AutoModel.from_pretrained(model_choice)
 
 embedding_dims_dict = {
-        "sentence-transformers/all-MiniLM-L6-v2": 384,
-        "sentence-transformers/msmarco-bert-base-dot-v5": 768,
-    }
+    "sentence-transformers/all-MiniLM-L6-v2": 384,
+    "sentence-transformers/msmarco-bert-base-dot-v5": 768,
+}
 
 embedding_dims = embedding_dims_dict[model_choice]
 
