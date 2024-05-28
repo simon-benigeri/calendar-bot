@@ -69,6 +69,18 @@ INTENT_CLASSIFICATION_PROMPT = """
   **Output**: {{'intent': 'calendar_qa'}}
 - **Input**: "And yesterday?"
   **Output**: {{'intent': 'calendar_qa'}}
+- **Input**: "Where am I having lunch?"
+  **Output**: {{'intent': 'calendar_qa'}}
+- **Input**: "Where is my next meeting?"
+  **Output**: {{'intent': 'calendar_qa'}}
+- **Input**: "Where is X happening?"
+  **Output**: {{'intent': 'calendar_qa'}}
+- **Input**: "Where is [EVENT]?"
+  **Output**: {{'intent': 'calendar_qa'}}
+- **Input**: "What is the location of [EVENT]?"
+  **Output**: {{'intent': 'calendar_qa'}}
+- **Input**: "Where is my next class?"
+  **Output**: {{'intent': 'calendar_qa'}}
 
 {format_instructions}
 
