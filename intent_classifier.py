@@ -81,6 +81,10 @@ INTENT_CLASSIFICATION_PROMPT = """
   **Output**: {{'intent': 'calendar_qa'}}
 - **Input**: "Where is my next class?"
   **Output**: {{'intent': 'calendar_qa'}}
+- **Input**: "What days of the week is conversational AI?"
+  **Output**: {{'intent': 'calendar_qa'}}
+- **Input**: "What days do I have class?"
+  **Output**: {{'intent': 'calendar_qa'}}
 
 {format_instructions}
 
@@ -116,23 +120,29 @@ def classify_intent(
     verbose: bool = False,
 ):
 
-    prompt = PromptTemplate(
-        template=INTENT_CLASSIFICATION_PROMPT,
-        input_variables=["query"],
-        partial_variables={"format_instructions": parser.get_format_instructions()},
-    )
+    # first try this
+    try:
+      prompt = PromptTemplate(
+          template=INTENT_CLASSIFICATION_PROMPT,
+          input_variables=["query"],
+          partial_variables={"format_instructions": parser.get_format_instructions()},
+      )
+      chain = prompt | llm | parser
 
-    # prompt = PromptTemplate(
-    #     template=INTENT_CLASSIFICATION_PROMPT,
-    #     input_variables=["query"],
-    # ).partial(
-    #     format_instructions=parser.get_format_instructions(),
-    #     pattern=re.compile(r"\`\`\`\n\`\`\`"),
-    # )
+      response = chain.invoke({"query": query})
+    except:
+      # if we don't get a response, try again with this
+      prompt = PromptTemplate(
+          template=INTENT_CLASSIFICATION_PROMPT,
+          input_variables=["query"],
+      ).partial(
+          format_instructions=parser.get_format_instructions(),
+          pattern=re.compile(r"\`\`\`\n\`\`\`"),
+      )
 
-    chain = prompt | llm | parser
+      chain = prompt | llm | parser
 
-    response = chain.invoke({"query": query})
+      response = chain.invoke({"query": query})
 
     if verbose:
         # print(

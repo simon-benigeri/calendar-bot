@@ -2,6 +2,7 @@ import asyncio
 import nest_asyncio
 import json
 import os
+import re
 from datetime import date
 
 from dotenv import load_dotenv
@@ -41,6 +42,21 @@ output: {{
     "extracted_dates": []
 }}
 
+query = "When do I have meetings this week?", Date = "Monday, May 27, 2024"
+output: {{
+    "extracted_dates": ["May 27, 2024", "May 28, 2024", "May 29, 2024", "May 30, 2024", "May 31, 2024", "June 1, 2024", "June 2, 2024"]
+}}
+
+query = "What is happening tomorrow?, Date = "Tuesday, May 28, 2024"
+output: {{
+    "extracted_dates": ["May 29, 2024"]
+}}
+
+query = "What is my schedule next Tuesday?, Date = "Monday, May 27, 2024" 
+output: {{
+    "extracted_dates": ["May 28, 2024"]
+}}
+
 Ensure each date is accurately calculated considering today’s date, ensuring that you address the query with precision and contextual awareness of the day of the week and calendar date. 
 
 {format_instructions}
@@ -67,18 +83,28 @@ def extract_dates(
     verbose: str = False,
 ):
 
-    prompt = PromptTemplate(
-        template=DATE_EXTRACTION_PROMPT,
-        input_variables=["date", "query"],
-        partial_variables={"format_instructions": parser.get_format_instructions()},
-    )
+    try:
+        prompt = PromptTemplate(
+            template=DATE_EXTRACTION_PROMPT,
+            input_variables=["date", "query"],
+            partial_variables={"format_instructions": parser.get_format_instructions()},
+        )
 
-    chain = prompt | llm | parser
+        chain = prompt | llm | parser
 
-    response = chain.invoke({"date": formatted_date, "query": query})
+        response = chain.invoke({"date": formatted_date, "query": query})
     # response["query"] = query
     # response["today"] = formatted_date
+    except:
 
+        # if we don't get a response, try again with this
+        prompt = PromptTemplate(
+            template=PromptTemplate,
+            input_variables=["date", "query"],
+        ).partial(
+            format_instructions=parser.get_format_instructions(),
+            pattern=re.compile(r"\`\`\`\n\`\`\`"),
+        )
     if verbose:
         # print(
         #     f"Current Date: {formatted_date} \n -> Extracted Dates: {response.get('extracted_dates', [])}"
