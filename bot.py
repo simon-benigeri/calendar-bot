@@ -89,7 +89,7 @@ async def get_response(
             response += chunk
     else:
         response = chain.invoke(input=input)
-        print("Response: {response}")
+        print(f"Response: {response}")
     return response
 
 
@@ -178,7 +178,13 @@ async def main(
                 print(f"EXTRACTED DATES: {dates.extracted_dates}")
 
             if verbose > 2:
-                print(f"DOCUMENTS RETRIEVED: {json.dumps(relevant_docs, indent=2)}")
+                # print(f"DOCUMENTS RETRIEVED: {json.dumps(relevant_docs, indent=2)}")
+                print(f"DOCUMENTS RETRIEVED:")
+                for event in relevant_docs:
+                    print(
+                        f"\t{event.get('date', 'NO DATE')}: {event.get('summary', 'NO SUMMARY')}, @ {event.get('location', 'NO LOCATION')}"
+                    )
+                print()
 
             prompt = ChatPromptTemplate.from_messages(
                 [
