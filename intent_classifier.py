@@ -23,7 +23,7 @@ INTENT_CLASSIFICATION_PROMPT = """
 
 **INTENTS**:
 - "ask_date": The user is asking for the current date.
-- "calendar_qa": The user inquires about events on their calendar.
+- "calendar_qa": The user inquires about events on their calendar. For example, when an event is taking place, or where an event is happening.
 - "out_of_scope": The query does not pertain to asking for the date or inquiring about calendar events.
 
 **Expected Output**:
