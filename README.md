@@ -75,8 +75,8 @@ Run the script with the following command:
 - **-v, --verbose**: Control the verbosity of the output:
   - `0`: Print only the response.
   - `1`: Print detected intent, number of documents retrieved, and dates extracted.
-  - `2`: Additionally, print processing time.
-  - `3`: Additionally, print details of the retrieved documents.
+  - `2`: Additionally, print details of the retrieved documents.
+  - `3`: Additionally, print processing time.
 
 Here is an example:  
 ```python bot.py --calendar_path "sample_calendar.json" --use_async --top_n 5 --fields "location,summary,description" --verbose 1```

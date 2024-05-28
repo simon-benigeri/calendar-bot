@@ -124,7 +124,7 @@ async def main(
         else:
             intent = classify_intent(query=question, llm=llm, parser=intent_parser)
 
-        if verbose > 1:
+        if verbose > 2:
             print(f"Intent retrieval time: {time.time() - start_time:.2f} seconds")
 
         if verbose > 0:
@@ -154,7 +154,7 @@ async def main(
                     formatted_date=formatted_date,
                     parser=date_parser,
                 )
-            if verbose > 1:
+            if verbose > 2:
                 print(f"Date extraction time: {time.time() - start_time:.2f} seconds")
 
             start_time = time.time()  # Start timing
@@ -166,7 +166,7 @@ async def main(
                 index=annoy_index,
                 top_n=top_n,
             )
-            if verbose > 1:
+            if verbose > 2:
                 print(
                     f"Document retrieval time: {time.time() - start_time:.2f} seconds"
                 )
@@ -177,7 +177,7 @@ async def main(
                 print(f"N DOCUMENTS RETRIEVED: {len(relevant_docs)}")
                 print(f"EXTRACTED DATES: {dates.extracted_dates}")
 
-            if verbose > 2:
+            if verbose > 1:
                 # print(f"DOCUMENTS RETRIEVED: {json.dumps(relevant_docs, indent=2)}")
                 print(f"DOCUMENTS RETRIEVED:")
                 for event in relevant_docs:
@@ -206,7 +206,7 @@ async def main(
                 },
                 stream_response=stream_response,
             )
-            if verbose > 1:
+            if verbose > 2:
                 print(
                     f"Response generation time: {time.time() - start_time:.2f} seconds"
                 )
@@ -265,8 +265,8 @@ if __name__ == "__main__":
             "Control the verbosity of the output: "
             "0 -> Print only the response; "
             "1 -> Print detected intent, number of documents retrieved, and dates extracted; "
-            "2 -> Additionally, print processing time; "
-            "3 -> Additionally, print details of the retrieved documents."
+            "2 -> Additionally, print details of the retrieved documents."
+            "3 -> Additionally, print processing time; "
         ),
     )
 
@@ -279,7 +279,7 @@ if __name__ == "__main__":
     start_time = time.time()  # Start timing
     annoy_index = build_annoy_index(calendar, args.fields)
 
-    if args.verbose > 1:
+    if args.verbose > 2:
         print(f"Annoy index building time: {time.time() - start_time:.2f} seconds")
 
     llm = ChatGoogleGenerativeAI(
