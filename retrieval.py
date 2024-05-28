@@ -66,7 +66,8 @@ def format_doc_date(doc_date):
         parsed_date = datetime.strptime(date_part, "%A %B %d, %Y")
 
         # Format the date to only show "Month DD, YYYY"
-        formatted_date = parsed_date.strftime("%B %d, %Y")
+        # formatted_date = parsed_date.strftime("%B %d, %Y")
+        formatted_date = parsed_date.strftime("%B %-d, %Y")
 
         return formatted_date
     except ValueError as e:
