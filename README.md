@@ -69,7 +69,7 @@ Run the script with the following command:
 #### Options
 - **-p, --calendar_path**: Specifies the path from which to load the calendar JSON file. Default is 'sample_calendar.json'.
 - **-a, --use_async**: Enable asynchronous operation for intent classification and date extraction.
-- **-s, --stream**: Streams the calendar_qa response chunk by chunk (it looks nice but it may not work in your environment).
+- **-s, --stream**: Streams the calendar_qa response chunk by chunk (**LEAVE THIS OUT OR SET IT TO FALSE**).
 - **-n, --top_n**: Specify the number of top documents to retrieve from the calendar (default is 5).
 - **-f, --fields**: Specify the fields from the calendar to be indexed (default are "location", "summary", "description").
 - **-v, --verbose**: Control the verbosity of the output:
@@ -80,3 +80,8 @@ Run the script with the following command:
 
 Here is an example:  
 ```python bot.py --calendar_path "sample_calendar.json" --use_async --top_n 5 --fields "location,summary,description" --verbose 1```
+
+**Command to run the demo**:
+```python bot.py --verbose 2```
+
+This will use the default settings, sample calendar data, and will print the response, intent, n_documents retrieved, dates extracted, and the details of the retrieved document.
