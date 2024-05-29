@@ -1,3 +1,4 @@
+demo_files/
 query*.json
 query_data/
 credentials.json
@@ -186,3 +187,4 @@ cython_debug/
 
 retrieval bot examples.txt
 diagram.json
+demo_files.zip

@@ -2,6 +2,28 @@
 A chatbot that you can answer any questions about your personal calendar.
 The bot uses Google Calendar data downloaded from a separate script, `download_calendar.py`. Once your calendar is downloaded, you can use run the `bot.py` script to for calendar Q & A.
 
+# CS 447 Demo Instructions HERE
+## Instructions to run the demo 
+1. unzip demo_files.zip
+    - The slides are in `Calendar Bot Demo Slides.pdf`
+    - The code and this README are in `calendar-bot-demo`, which contains:
+        - The `.env` includes a GEMINI API key.
+        - `sample_calendar.json` contains sample calendar data for the demo. Downloaded on Tuesday, May 28, 2024. The calendar content is described on slide 9.
+        - `requirements_demo.txt` is a list of python libraries to install to run the code.
+        - Google Calendar download related code can be found in `test_google_calendar_access.py` and `download_calendar.py`. See `download_calendar.py` for how we downloaded and preprocessed the calendar data saved in `sample_calendar.json`. You cannot run this code without Google Calendar Access credentials, which have not been provided for you. Instead, we provide the calendar data.
+        - `bot.py` is the script to run the bot. The intent classification code is in `intent_classifier.py`. The date extraction code is in `date_extraction.py` and retrieval & vector index code is in `retrieval.py`
+2. Navigate into the directory `calendar-bot-demo`
+3. Create a `python=3.10` environment and install the requirements:
+    ```bash
+    conda create -n calendar-bot python=3.10 
+    conda activate calendar-bot  
+    pip install -r requirements_demo.txt
+    ``` 
+3. Run the bot with default settings and verbosity set at 2 (prints the response, detected intent, dates extracted, number of documents retrieved, and the details of the retrieved documents): ```python bot.py --verbose 2```
+
+
+# General Instructions
+
 ## Setting up 
 
 ### 1. Python requirements
@@ -81,7 +103,3 @@ Run the script with the following command:
 Here is an example:  
 ```python bot.py --calendar_path "sample_calendar.json" --use_async --top_n 5 --fields "location,summary,description" --verbose 1```
 
-**Command to run the demo**:
-```python bot.py --verbose 2```
-
-This will use the default settings, sample calendar data, and will print the response, intent, n_documents retrieved, dates extracted, and the details of the retrieved document.
