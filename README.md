@@ -103,3 +103,8 @@ Run the script with the following command:
 Here is an example:  
 ```python bot.py --calendar_path "sample_calendar.json" --use_async --top_n 5 --fields "location,summary,description" --verbose 1```
 
+## Architecture
+
+A hand drawn architecture diagram can be found here:
+![Architecture Diageam](assets/calendar_bot_architecture.png)
+
