@@ -1,6 +1,6 @@
 # calendar-bot
 A chatbot that you can answer any questions about your personal calendar.
-The bot uses Google Calendar data downloaded from a separate script, `download_calendar.py`. Once your calendar is downloaded, you can use run the `bot.py` script to for calendar Q & A.
+The bot uses Google Calendar data downloaded from a separate script, `download_calendar.py`. Once your calendar is downloaded, you can run the `bot.py` script for calendar Q & A.
 
 # CS 447 Demo Instructions HERE
 ## Instructions to run the demo 
@@ -44,14 +44,13 @@ GOOGLE_API_KEY=<API_KEY>
 ```
 
 ### 3. Google Calendar data access
-The chatbot answers questions about your own personal Google Calendar. This demo focuses on the conversational functionalities, not integration with other services. If you wish to use your own personal calendar data, you can need Google Calendar API access. If you are running the demo code, use the sample calendar data in `sample_calendar.json`.
+The chatbot answers questions about your own personal Google Calendar. This demo focuses on the conversational functionalities, not integration with other services. If you wish to use your own personal calendar data, you need Google Calendar API access. If you are running the demo code and do not care about conversing with the bot using your own calendar data as context, use the sample calendar data in `sample_calendar.json`.
 
 #### Sample calendar data:
 The file `sample_calendar.json` contains a calendar that you can use to test the chatbot. This file contains personal data and will be provided with the demo code.
 
 #### Google Calendar API access instructions:
-1. Go to https://cloud.google.com/endpoints/docs/openapi/enable-api#console (make sure you are logged in) and click on `Go to APIs & Services1
- Instructions: Set Up Google Cloud Project
+1. Go to https://cloud.google.com/endpoints/docs/openapi/enable-api#console (make sure you are logged in) and click on `Go to APIs & Services`
 2. Create a Google Cloud project if you don't have one:
     - Visit the Google Cloud Console.
     - Click on "New Project", give it a name, and create it.
